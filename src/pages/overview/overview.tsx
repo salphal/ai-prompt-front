@@ -54,8 +54,8 @@ const Overview: React.FC<OverviewProps> = (props: OverviewProps) => {
         {/*<PromptMessage/>*/}
 
         <div className={Styles.info}>
-          <div className={Styles.title}>挑选一个面具</div>
-          <div className={Styles.subTitle}>现在开始, 与面具背后的灵魂碰撞</div>
+          <div className={Styles.title}>挑选一个提示词</div>
+          <div className={Styles.subTitle}>现在开始, 与面具提示词的灵魂碰撞</div>
         </div>
         <div className={Styles.controller}>
           <Button className={'mr-3'} icon={<EyeOutlined/>}><Link to={'/home'}>查看全部</Link></Button>
