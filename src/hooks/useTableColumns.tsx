@@ -1,4 +1,5 @@
 import {useMemo} from "react";
+import TextOverflowTip from "@/components/text-overflow-tip";
 
 export interface IUseTableColumnsProps {
   [key: string]: any;
@@ -23,7 +24,10 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       ...operations
     };
 
-    return [...columns, operationsColumn];
+    return [
+      ...columns.map((v: any) => ({...v, render: (v: any) => <TextOverflowTip width={v.width}>{v}</TextOverflowTip>})),
+      operationsColumn
+    ];
 
   }, [columns])
 
