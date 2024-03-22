@@ -1,4 +1,5 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
+import {createJSONStorage, persist} from "zustand/middleware";
 import {setStoreProperties} from "@/utils/prompt.ts";
 
 export interface IPromptStore {
@@ -6,16 +7,24 @@ export interface IPromptStore {
 }
 
 export const initialPromptData = {
-  promptData: {},
+  promptData: [],
 }
 
 // useShallow(); 对象浅比较, 减少重绘
 // const {
 //  promptData,
 // } = usePromptStore(useShallow((state: any) => state));
-const usePromptStore = create<IPromptStore>((set, get) => ({
-  ...initialPromptData
-}));
+const usePromptStore = create(
+  persist<IPromptStore>(
+    (set, get) => ({
+      ...initialPromptData
+    }),
+    {
+      name: 'promptStore', // unique name
+      storage: createJSONStorage(() => localStorage), // localStorage | sessionStorage | ...
+    },
+  ),
+);
 
 export const setPromptStore = (props: any) =>
   usePromptStore.setState((prev: any) => ({...prev, ...props}));
@@ -24,8 +33,8 @@ export const setPromptProperty = (key: string, value: any, merge = true, insertB
   setStoreProperties(usePromptStore, key, value, merge, insertBefore);
 };
 
-export const setPromptData = (obj: any, merge = true) =>
-  setPromptProperty('promptData', obj, merge);
+export const setPromptData = (data: any, merge = false) =>
+  setPromptProperty('promptData', data, merge);
 
 export const resetPromptData = () =>
   setPromptProperty('promptData', initialPromptData.promptData, false);
