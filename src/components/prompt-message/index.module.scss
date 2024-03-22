@@ -1,0 +1,12 @@
+.promptMessage {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+
+  .role {
+  }
+
+  .content {
+    flex: 1;
+  }
+}

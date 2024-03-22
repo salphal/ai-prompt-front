@@ -1,0 +1,15 @@
+.draggableItem {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  .draggableItemDragIcon:active {
+    cursor: grab;
+  }
+
+  .draggableItemContent {
+    flex: 1;
+  }
+}

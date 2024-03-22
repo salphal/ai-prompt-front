@@ -1,0 +1,32 @@
+.overview {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  height: 100%;
+
+  .info {
+    margin-top: 10%;
+    text-align: center;
+
+    .title {
+      font-size: 32px;
+    }
+
+    .subTitle {
+      font-size: 24px;
+    }
+  }
+
+  .controller {
+    height: 8%;
+    min-height: 40px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .content {
+    flex: 1;
+  }
+}
