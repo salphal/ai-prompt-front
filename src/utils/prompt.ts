@@ -9,9 +9,7 @@ const isZustandFunc = (target: any) => typeof target === 'function'
 const isZustandArray = (target: any) => Array.isArray(target)
 
 const isZustandStore = (store: any) => {
-  return typeof store.setState === 'function' &&
-    typeof store.getState === 'function' &&
-    typeof store.subscribe === 'function'
+  return typeof store.name === 'string' && store.name === 'useBoundStore';
 }
 
 export const setStoreProperties = (
@@ -21,13 +19,13 @@ export const setStoreProperties = (
   merge = true,
   insertBefore = false
 ) => {
-  if (!store || isZustandStore(store)) return
+  if (!store || !isZustandStore(store)) return
   if (isZustandObject(value)) {
     store.setState((prev: any) => ({
       ...prev,
       [key]: merge
-        ? { ...prev[key], ...value }
-        : { ...value }
+        ? {...prev[key], ...value}
+        : {...value}
     }))
   } else if (isZustandArray(value)) {
     store.setState((prev: any) => ({
