@@ -60,7 +60,7 @@ const Overview: React.FC<OverviewProps> = (props: OverviewProps) => {
         </div>
         <div className={Styles.controller}>
           <Button className={'mr-3'} icon={<EyeOutlined/>}><Link to={'/home'}>查看全部</Link></Button>
-          <TextOverflowTip width={100} popRender={(p: any) => p.children}>aadwadwa</TextOverflowTip>
+          <TextOverflowTip width={100} popRender={(p: any) => p.children}></TextOverflowTip>
         </div>
         <div className={Styles.content}>
         </div>
