@@ -1,45 +1,48 @@
 import React, {
-  useEffect,
-  useImperativeHandle,
   ForwardRefRenderFunction,
-  Ref,
-  useState,
   ReactNode,
-  useMemo
+  Ref,
+  useImperativeHandle,
+  useMemo,
+  useState
 } from "react";
-import {Button, ConfigProvider, Modal, Spin} from "antd";
-import {CloseOutlined, InfoCircleFilled, CheckCircleFilled} from '@ant-design/icons';
-import {createStyles} from 'antd-style';
-
-const useStyle = createStyles(() => ({
-  'confirm-modal-header': {},
-  'confirm-modal-body': {
-    position: 'relative',
-  },
-  'confirm-modal-content': {},
-  'confirm-modal-footer': {},
-  'confirm-modal-mask': {},
-}));
+import {Button, Modal, Spin} from "antd";
+import {Scrollbars} from "react-custom-scrollbars-2";
+import {
+  CheckCircleFilled,
+  CloseOutlined,
+  InfoCircleFilled
+} from "@ant-design/icons";
 
 const modalIconList: any = {
-  info: <InfoCircleFilled/>,
-  success: <CheckCircleFilled/>,
-  danger: <InfoCircleFilled/>,
+  info: <InfoCircleFilled style={{color: "#0166FF"}}/>,
+  success: <CheckCircleFilled style={{color: "#138d49"}}/>,
+  danger: <InfoCircleFilled style={{color: "#f31c1c"}}/>
 };
 
-export interface ConfirmModalProps {
+export interface IModalContentStyle {
   [key: string]: any;
 
+  header: any;
+  body: any;
+  mask: any;
+  footer: any;
+  content: any;
+}
+
+export interface ConfirmModalProps {
   /** 弹窗标题 */
   title?: ReactNode;
+
   /** 是否在加载 */
   loading?: boolean;
   /** 是否禁用 */
   disabled?: boolean;
+
   /** 自定义底部控制按钮 */
   footer?: ReactNode;
-
   /** 弹窗消息内容 */
+
   message?: string;
   /** 弹窗消息icon类型 */
   messageIconType?: string;
@@ -50,11 +53,17 @@ export interface ConfirmModalProps {
   width?: string | number;
   /** 弹窗高度 */
   height?: string | number;
+
   /** 弹窗内容区那边距 */
   contentPadding?: string | number;
-
-  /** 自动取消, 关闭Modal */
+  /** 自动关闭 */
   closedAble?: boolean;
+
+  /** 自定义样式对象 */
+  styles?: IModalContentStyle;
+  /** 弹窗内容区域样式 */
+  contentStyles?: object;
+
   /** 确认按钮事件 */
   onConfirm?: () => void;
   /** 取消按钮事件 */
@@ -65,58 +74,55 @@ export interface ConfirmModalProps {
   onAfterClose?: () => void;
   /** 禁用点击事件 */
   onDisabledClick?: () => void;
+
+  [key: string]: any;
 }
 
 interface ConfirmModalRef {
   [key: string]: any;
 }
 
-const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps> = (
-  props: ConfirmModalProps,
-  ref: Ref<ConfirmModalRef | HTMLDivElement>
-) => {
-
+const ConfirmModal: ForwardRefRenderFunction<
+  ConfirmModalRef,
+  ConfirmModalProps
+> = (props: ConfirmModalProps, ref: Ref<ConfirmModalRef | HTMLDivElement>) => {
   const {
-    title = '提示',
+    title = "提示",
     loading = false,
     disabled = false,
     footer,
 
-    message = '',
-    messageIconType = '',
+    message = "",
+    messageIconType = "",
 
-    top = '20%',
+    top = "20%",
     width = 500,
-    height = 'auto',
-    contentPadding = '8px 0 12px 0',
+    height = "auto",
+    contentPadding = "12px",
+    styles = {},
+    contentStyles = {
+      height: 300
+    } as any,
 
-    closedAble = false,
+    closedAble = true,
     onConfirm,
     onCancel,
     onClose,
     onAfterClose,
     onDisabledClick,
 
-    children = <>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-    </>,
+    children = (
+      <>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </>
+    ),
 
     ...restProps
   } = props;
 
-  const {styles} = useStyle();
-
   const [isOpen, setIsOpen] = useState(false);
-
-  const classNames = {
-    body: styles['confirm-modal-body'],
-    mask: styles['confirm-modal-mask'],
-    header: styles['confirm-modal-header'],
-    footer: styles['confirm-modal-footer'],
-    content: styles['confirm-modal-content'],
-  };
 
   const modalStyles = {
     header: {},
@@ -128,21 +134,22 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
       marginTop: 0
     },
     content: {},
+    ...styles
   };
-
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({
     isOpen,
     setIsOpen,
-    showModal: () => handleConfirmModalEventAspect('show'),
-    hideModal: () => handleConfirmModalEventAspect('hide'),
+    showModal: () => handleConfirmModalEventAspect("show"),
+    hideModal: () => handleConfirmModalEventAspect("hide")
   }));
 
-  useEffect(() => {
-  }, []);
-
-  const handleConfirmModalEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
+  const handleConfirmModalEventAspect = (
+    type: string,
+    kwargs: object = {},
+    ...args: any[]
+  ) => {
     const handles: any = {
       confirm: handleConfirmModalOnConfirm,
       cancel: handleConfirmModalOnCancel,
@@ -157,25 +164,25 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
   };
 
   const handleConfirmModalOnConfirm = () => {
-    typeof onConfirm === 'function' && onConfirm();
+    typeof onConfirm === "function" && onConfirm();
   };
 
   const handleConfirmModalOnCancel = () => {
     closedAble && setIsOpen(false);
-    typeof onCancel === 'function' && onCancel();
+    typeof onCancel === "function" && onCancel();
   };
 
   const handleConfirmModalOnClose = () => {
     setIsOpen(false);
-    typeof onClose === 'function' && onClose();
+    typeof onClose === "function" && onClose();
   };
 
   const handleConfirmModalOnAfterClose = () => {
-    typeof onAfterClose === 'function' && onAfterClose();
+    typeof onAfterClose === "function" && onAfterClose();
   };
 
   const handleConfirmModalOnDisabled = () => {
-    typeof onDisabledClick === 'function' && onDisabledClick();
+    typeof onDisabledClick === "function" && onDisabledClick();
   };
 
   const handleConfirmModalOnShow = () => {
@@ -186,21 +193,23 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
     setIsOpen(false);
   };
 
-  const defaultFooter = <>
-    <Button
-      type="primary"
-      onClick={() => handleConfirmModalEventAspect('confirm')}
-      loading={loading}
-    >
-      确认
-    </Button>
-    <Button
-      onClick={() => handleConfirmModalEventAspect('destroy')}
-      disabled={loading}
-    >
-      取消
-    </Button>
-  </>;
+  const defaultFooter = (
+    <>
+      <Button
+        type="primary"
+        onClick={() => handleConfirmModalEventAspect("confirm")}
+        loading={loading}
+      >
+        确认
+      </Button>
+      <Button
+        onClick={() => handleConfirmModalEventAspect("cancel")}
+        disabled={loading}
+      >
+        取消
+      </Button>
+    </>
+  );
 
   const promptMessage = useMemo(() => {
     let icon: any = null;
@@ -211,67 +220,82 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
       return (
         <div
           style={{
-            padding: '30px 0 60px 0',
-            textAlign: 'center',
-            fontSize: '18px',
+            padding: "30px 0 60px 0",
+            textAlign: "center",
+            fontSize: "18px"
           }}
         >
-          {icon && <span style={{ marginRight: '8px' }}>{icon}</span>}
+          {icon && <span style={{marginRight: "8px"}}>{icon}</span>}
           <span>{message}</span>
         </div>
       );
     };
   }, [messageIconType, message]);
 
-  const content = message ?
-    promptMessage() :
-    typeof children === 'function' ? children(props) : children;
+  const content = message
+    ? promptMessage()
+    : typeof children === "function"
+      ? children(props)
+      : children;
 
   return (
     <React.Fragment>
-
-      <ConfigProvider
-        modal={{
-          classNames,
-          styles: modalStyles,
-        }}
-      >
-        {isOpen && <Modal
+      {isOpen && (
+        <Modal
           title={title}
           open={isOpen}
           footer={footer ? footer : defaultFooter}
           width={width}
           style={{top, height}}
-          closeIcon={<CloseOutlined onClick={() => handleConfirmModalEventAspect('close')}/>}
-          onCancel={() => handleConfirmModalEventAspect('cancel')}
-          afterClose={() => handleConfirmModalEventAspect('afterClose')}
+          styles={modalStyles}
+          closeIcon={
+            <CloseOutlined
+              onClick={() => handleConfirmModalEventAspect("close")}
+            />
+          }
+          onCancel={() => handleConfirmModalEventAspect("cancel")}
+          afterClose={() => handleConfirmModalEventAspect("afterClose")}
           {...restProps}
         >
-          {loading && <Spin
-            style={{
-              position: 'absolute',
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)"
-            }}
-          />}
-          {loading || disabled && <div
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: 'transparent',
-              zIndex: 9999,
-              cursor: "not-allowed",
-            }}
-            onClick={() => handleConfirmModalEventAspect('disabled')}
-          />}
-          {content}
-        </Modal>}
-      </ConfigProvider>
-
+          <Scrollbars
+            style={{height: contentStyles.height}}
+            autoHide
+          >
+            <section
+              className={"modal-content"}
+              style={{padding: 20, ...contentStyles}}
+            >
+              {loading && (
+                <Spin
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    zIndex: 9999,
+                    transform: "translate(-50%, -50%)"
+                  }}
+                />
+              )}
+              {Boolean(loading || disabled) && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "transparent",
+                    zIndex: 9998,
+                    cursor: "not-allowed"
+                  }}
+                  onClick={() => handleConfirmModalEventAspect("disabled")}
+                />
+              )}
+              {content}
+            </section>
+          </Scrollbars>
+        </Modal>
+      )}
     </React.Fragment>
   );
 };
