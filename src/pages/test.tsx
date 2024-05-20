@@ -13,7 +13,7 @@ const Test: React.FC<TestProps> = (props: TestProps) => {
   const {} = props
 
   useEffect(() => {
-    const countDown = new Countdown(10, (count) => {
+    const countDown = new Countdown(10, (count: number) => {
       setCount(count);
     });
     countDown.start();

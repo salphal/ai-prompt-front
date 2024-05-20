@@ -7,7 +7,7 @@ export default class Countdown {
 
   constructor(
     initialValue = 0,
-    callback = () => {},
+    callback: (count: number) => void,
     duration = 300,
     step = 1
   ) {
