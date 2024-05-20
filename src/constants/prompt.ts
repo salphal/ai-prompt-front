@@ -33,7 +33,7 @@ export const PROMPT_MODEL_LABELS = {
   [PROMPT_MODEL_KEYS.max_tokens]: '单次回复限制',
   [PROMPT_MODEL_KEYS.presence_penalty]: '话题新鲜度',
   [PROMPT_MODEL_KEYS.frequency_penalty]: '频率惩罚度',
-  [PROMPT_MODEL_KEYS.sendMemory]: '是否自动压缩聊天记录',
+  [PROMPT_MODEL_KEYS.sendMemory]: '自动压缩聊天记录',
   [PROMPT_MODEL_KEYS.historyMessageCount]: '附带历史消息数',
   [PROMPT_MODEL_KEYS.compressMessageLengthThreshold]: '压缩消息长度阈值',
 }

@@ -1,4 +1,4 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
+import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useRef, useState} from "react";
 import classNames from "classnames";
 import {Button, Form, Input, Pagination, Table, Upload} from "antd";
 import {TABLE_COLUMNS} from "@/pages/home/constant.tsx";
@@ -7,7 +7,11 @@ import {PROMPT_ITEM_KEYS, PROMPT_ITEM_LABELS} from "@/constants/prompt.ts";
 import useClientRect from "@/hooks/useClientRect.ts";
 import {DownloadOutlined, UploadOutlined, RedoOutlined} from "@ant-design/icons";
 import useUpload from "@/hooks/useUpload.ts";
-import useTableColumns from "@/hooks/useTableColumns.ts";
+import useTableColumns from "@/hooks/useTableColumns.tsx";
+import usePromptStore, {setPromptData} from "@/store/prompt.ts";
+import {useShallow} from "zustand/react/shallow";
+import EditModalInfo from "@/pages/home/components/edit-model-info";
+import EditPrompt from "@/pages/home/components/edit-prompt";
 
 export interface HomeProps {
   [key: string]: any;
@@ -26,6 +30,13 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
 
   const {} = props;
 
+  const editModelInfoRef = useRef<any>(null);
+  const editPromptRef = useRef<any>(null);
+
+  const {
+    promptData,
+  } = usePromptStore(useShallow((state: any) => state));
+
   const {height: tableHeight} = useClientRect({id: 'table-wrapper'});
   const tableScroll = {
     y: tableHeight ? tableHeight - 56 : 1000,
@@ -35,7 +46,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     onBefore: () => false
   });
 
-  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState([]);
   const [paginationConfig, setPaginationConfig] = useState<any>({
     current: 1,
     pageSize: 10,
@@ -48,15 +59,24 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   useEffect(() => {
     if (!Array.isArray(fileContent.content)) return;
     const data = fileContent.content.map((v: any) => ({...v, ...v.modelConfig}));
-    setTableData(data);
+    setPaginationConfig((p: any) => ({...p, total: data.length}));
+    setPromptData(data);
   }, [fileContent]);
 
-
   const tableOperationsColumn = {
-    render: () => {
+    render: (_: any, record: any) => {
       return (
         <div>
-          <Button className={classNames({})} size={'small'}>编辑</Button>
+          <Button
+            className={classNames(['mr-3'])}
+            size={'small'}
+            onClick={() => handlePromptEventAspect('edit', record)}
+          >编辑</Button>
+          <Button
+            className={classNames(['mr-3'])}
+            size={'small'}
+            onClick={() => handlePromptEventAspect('prompt')}
+          >提示词</Button>
         </div>
       );
     }
@@ -67,8 +87,35 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     setPaginationConfig((prev: any) => ({...prev, current, pageSize}));
   };
 
-  const buttonOnExport = () => {
+  const handlePromptEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
+    const handles: any = {
+      search: handlePromptOnSearch,
+      export: handlePromptOnExport,
+      reset: handlePromptOnReset,
+      edit: handlePromptOnEdit,
+      prompt: handlePromptOnPrompt
+    };
+    args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
+    handles[type] && handles?.[type](...args);
+  };
+
+  const handlePromptOnSearch = () => {
+  };
+
+  const handlePromptOnExport = () => {
     onExportFile(fileContent);
+  };
+
+  const handlePromptOnReset = () => {
+    setPromptData([]);
+  };
+
+  const handlePromptOnEdit = (record: any) => {
+    editModelInfoRef && editModelInfoRef?.current && editModelInfoRef.current.showModal(record);
+  };
+
+  const handlePromptOnPrompt = (record: any) => {
+    editPromptRef && editPromptRef?.current && editPromptRef.current.showModal(record);
   };
 
   return (
@@ -86,15 +133,24 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
           </Form>
           <div className={'flex flex-row'}>
             <Upload {...uploadProps}>
-              <Button className={'mr-3'} icon={< DownloadOutlined/>}>导入</Button>
+              <Button
+                className={'mr-3'} icon={< DownloadOutlined/>}>导入</Button>
             </Upload>
-            <Button className={'mr-3'} icon={<UploadOutlined/>} onClick={buttonOnExport}>导出</Button>
-            <Button icon={<RedoOutlined/>} onClick={buttonOnExport}>重置</Button>
+            <Button
+              className={'mr-3'}
+              icon={<UploadOutlined/>}
+              onClick={() => handlePromptEventAspect('export')}
+            >导出</Button>
+            <Button
+              icon={<RedoOutlined/>}
+              onClick={() => handlePromptEventAspect('reset')}
+            >重置</Button>
           </div>
         </div>
         <div id={'table-wrapper'} className={'flex-1'}>
           <Table
-            dataSource={tableData}
+            rowKey={(record: any) => record.key || record.id}
+            dataSource={promptData}
             columns={tableColumns}
             pagination={false}
             scroll={tableScroll}
@@ -112,6 +168,9 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
           />
         </div>
       </div>
+
+      <EditModalInfo ref={editModelInfoRef}/>
+      <EditPrompt ref={editPromptRef}/>
 
     </React.Fragment>
   );

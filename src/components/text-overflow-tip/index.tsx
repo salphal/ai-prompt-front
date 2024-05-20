@@ -1,16 +1,24 @@
-import React, {useEffect, useImperativeHandle, ForwardRefRenderFunction, Ref, useRef, useState, ReactNode} from "react";
-import {Tooltip} from "antd";
+import React, {
+  useEffect,
+  useImperativeHandle,
+  ForwardRefRenderFunction,
+  Ref,
+  useRef,
+  useState,
+  useMemo
+} from "react";
+import {Popover} from "antd";
 import useClientRect from "@/hooks/useClientRect.ts";
 
-const singleLineStyle = (width: number) => ({
-  width,
+const singleLineStyle = (width: number | string = 'auto') => ({
+  maxWidth: width,
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis'
 });
 
-const multiLineStyle = (width: number, total: number) => ({
-  width,
+const multiLineStyle = (width: number | string = 'auto', total: number) => ({
+  maxWidth: width,
   overflow: 'hidden',
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical' as const,
@@ -25,11 +33,27 @@ export interface TextOverflowTipProps {
   /** 总共多少行 */
   multiNumber: number;
   /** 文本内容 */
-  children?: ReactNode;
+  children?: any;
+
   /** 宽度 */
   width?: number;
+  /** 弹窗背景色 */
+  color?: string;
+
+  /** 鼠标移入后延时多少才显示 */
+  mouseEnterDelay: number;
+  /** 鼠标移出后延时多少才隐藏 */
+  mouseLeaveDelay: number;
   /** 触发方式 */
-  trigger?: 'hover' | 'focus' | 'click' | 'contextMenu';
+  trigger?: 'hover' | 'focus' | 'click';
+
+  /** 弹出内容的渲染 */
+  popRender: (...args: any[]) => void;
+  /** 是否弹出提示 */
+  popAble: boolean;
+
+  /** 显示隐藏的回调 */
+  onOpenChange?: (open: boolean) => void;
 }
 
 interface TextOverflowTipRef {
@@ -44,14 +68,24 @@ const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflow
 
   const {
     children,
+
     width: originalWidth = 200,
+    color = 'white',
     trigger = 'hover',
+
+    mouseEnterDelay = 0.3,
+    mouseLeaveDelay = 0.3,
+
     multiLine = false,
     multiNumber = 1,
+
+    popAble = true,
+    popRender,
+
     ...resetProps
   } = props;
 
-  const [tip, setTip] = useState('');
+  const [isOverflow, setIsOverflow] = useState<any>(false);
 
   const contentRef = useRef(null);
   const {width: realWidth} = useClientRect({domRef: contentRef});
@@ -60,29 +94,38 @@ const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflow
   useImperativeHandle(ref, () => ({}));
 
   useEffect(() => {
-    if (!realWidth || !children || typeof children !== 'string') {
-      setTip('');
-      return;
-    }
-    originalWidth - 1 >= realWidth ? setTip('') : setTip(children);
+    if (!realWidth) return;
+    setIsOverflow(originalWidth <= realWidth);
   }, [children, originalWidth, realWidth]);
+
+  const overflowContent = useMemo(() => () => {
+    return <span
+      ref={contentRef}
+      style={
+        multiLine ?
+          multiLineStyle(originalWidth, multiNumber) :
+          singleLineStyle(originalWidth)
+      }
+    >{children}</span>;
+  }, [multiLine]);
+
+  const content = typeof children === 'function' ? children(props) : children;
+
+  const popoverContent = typeof popRender === 'function' ? popRender(props) : content;
 
   return (
     <React.Fragment>
 
-      {typeof children === 'string'
-        ? <Tooltip title={tip} {...resetProps} autoAdjustOverflow>
-        <span
-          ref={contentRef}
-          style={
-            multiLine ?
-              multiLineStyle(originalWidth, multiNumber) :
-              singleLineStyle(originalWidth)
-          }
-        >{children}</span>
-        </Tooltip>
-        : children
-      }
+      {popAble && isOverflow ?
+        <Popover
+          content={popoverContent}
+          trigger={trigger}
+          autoAdjustOverflow
+          {...resetProps}
+        >
+          {overflowContent()}
+        </Popover> :
+        overflowContent()}
 
     </React.Fragment>
   );

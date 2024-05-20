@@ -1,4 +1,4 @@
-import React, { Ref, useEffect, useRef } from 'react';
+import React, {MutableRefObject, Ref, useEffect, useRef} from 'react';
 
 const isString = (target: any): boolean => typeof target === 'string';
 
@@ -7,7 +7,7 @@ const isFunction = (target: any): boolean => typeof target === 'function';
 const isElement = (htmlElement: any): boolean =>
   htmlElement !== null && htmlElement instanceof Element;
 
-const isElementRefObject = <T,>(value: any): value is React.RefObject<T> => {
+const isElementRefObject = <T, >(value: any): value is React.RefObject<T> => {
   return (
     value &&
     typeof value === 'object' &&
@@ -41,21 +41,32 @@ const getHtmlElement = (
 
 const getElementRect = (dom: Element) => {
   const rect = dom.getBoundingClientRect();
-  return { rect, scrollTop: dom.scrollTop, scrollHeight: dom.scrollHeight };
+  return {rect, scrollTop: dom.scrollTop, scrollHeight: dom.scrollHeight};
 };
 
-const useScroll = (kwargs: { [key: string]: any }) => {
-  /**
-   * @param htmlElement {Element}           HTML元素
-   * @param htmlElementRef {Ref<Element>}   useRef<Element>();
-   * @param querySelector {String}          用于查询元素的 id/class/tagName
-   *
-   * @param isShow {boolean}                有且仅当该元素显示的时候才执行( 在弹窗中时 )
-   * @param minOffsetHeight {Number}        滚动条到底部的最小偏移量
-   *
-   * @param onScroll {Function}             元素滚动事件
-   * @param onTouchToBottom {Function}      元素滚动条到底部事件
-   */
+interface IUseScroll {
+  [key: string]: any;
+
+  /** 有且仅当该元素显示的时候才执行( 在弹窗中时 ) */
+  isShow: boolean;
+
+  /** HTML元素 */
+  htmlElement?: HTMLElement;
+  /** useRef<Element>() */
+  htmlElementRef?: MutableRefObject<any>;
+  /** 用于查询元素的 id/class/tagName */
+  querySelector?: string;
+  /** 滚动条到底部的最小偏移量 */
+  minOffsetHeight?: number;
+
+  /** 元素滚动事件 */
+  onScroll?: () => void;
+  /** 元素滚动条到底部事件 */
+  onTouchToBottom?: () => void;
+}
+
+const useScroll = (kwargs: IUseScroll) => {
+
   const {
     htmlElement = null,
     htmlElementRef = null,
@@ -90,11 +101,11 @@ const useScroll = (kwargs: { [key: string]: any }) => {
 
     isFunction(onScroll) && onScroll();
 
-    const { rect, scrollTop, scrollHeight } = getElementRect(
+    const {rect, scrollTop, scrollHeight} = getElementRect(
       domRef.current as Element
     );
 
-    const { height } = rect;
+    const {height} = rect;
     domRectRef.current = rect;
 
     // The scroll bar touches the bottom

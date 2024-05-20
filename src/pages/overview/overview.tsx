@@ -6,6 +6,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import {Link} from "react-router-dom";
+import TextOverflowTip from "@/components/text-overflow-tip";
 
 export interface OverviewProps {
   [key: string]: any;
@@ -59,7 +60,7 @@ const Overview: React.FC<OverviewProps> = (props: OverviewProps) => {
         </div>
         <div className={Styles.controller}>
           <Button className={'mr-3'} icon={<EyeOutlined/>}><Link to={'/home'}>查看全部</Link></Button>
-          {/*<Button icon={<UploadOutlined/>}></Button>*/}
+          <TextOverflowTip width={100} popRender={(p: any) => p.children}>aadwadwa</TextOverflowTip>
         </div>
         <div className={Styles.content}>
         </div>

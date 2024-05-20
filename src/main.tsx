@@ -1,15 +1,18 @@
 import ReactDOM from 'react-dom/client'
 import {BrowserRouter} from 'react-router-dom';
-import App from './App.tsx'
 import "normalize.css"
-import './main.scss'
 import {ConfigProvider} from "antd";
+import {StyleProvider} from '@ant-design/cssinjs';
+import App from './App.tsx'
+import './main.scss'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode>
   <BrowserRouter>
     <ConfigProvider>
-      <App/>
+      <StyleProvider hashPriority="high">
+        <App/>
+      </StyleProvider>
     </ConfigProvider>
   </BrowserRouter>
   // </React.StrictMode>,

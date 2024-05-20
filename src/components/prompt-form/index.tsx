@@ -1,7 +1,7 @@
 import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle} from "react";
 import Styles from "./index.module.scss";
 import classNames from "classnames";
-import {Button, Form, InputNumber, Select, Slider, Switch} from "antd";
+import {Form, InputNumber, Select, Slider, Switch} from "antd";
 import {useForm} from "antd/es/form/Form";
 import {PROMPT_MODEL_KEYS, PROMPT_MODEL_LABELS, PROMPT_MODELS} from "@/constants/prompt.ts";
 import {defaultFormData} from "@/components/prompt-form/constant.ts";
@@ -27,38 +27,20 @@ const PromptForm: ForwardRefRenderFunction<PromptFormRef, PromptFormProps> = (
   const {} = props;
 
   // Customize instance values exposed to parent components
-  useImperativeHandle(ref, () => ({}));
+  useImperativeHandle(ref, () => ({
+    form,
+    getFieldsValue: form.getFieldsValue,
+    setFieldsValue: form.setFieldsValue,
+    validateFields: form.validateFields
+  }));
 
   useEffect(() => {
     form.setFieldsValue(defaultFormData);
   }, []);
 
-  const layout = {
+  const formLayout = {
     labelCol: {span: 8},
     wrapperCol: {span: 16},
-  };
-
-  const buttonItemLayout = {wrapperCol: {span: 16, offset: 8}}
-
-  const handlePromptFormEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
-    const handles: any = {
-      confirm: handlePromptFormOnConfirm,
-      reset: handlePromptFormOnReset,
-      cancel: handlePromptFormOnCancel,
-    };
-    args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
-    handles[type] && handles?.[type](...args);
-  };
-
-  const handlePromptFormOnConfirm = () => {
-    const formData = form.getFieldsValue();
-    console.log('=>(index.tsx:55) formData', formData);
-  };
-
-  const handlePromptFormOnReset = () => {
-  };
-
-  const handlePromptFormOnCancel = () => {
   };
 
   return (
@@ -67,7 +49,8 @@ const PromptForm: ForwardRefRenderFunction<PromptFormRef, PromptFormProps> = (
       <Form
         className={classNames([Styles.promptForm])}
         form={form}
-        {...layout}
+        labelAlign={'left'}
+        {...formLayout}
       >
         <Form.Item
           name={PROMPT_MODEL_KEYS.model}
@@ -124,10 +107,6 @@ const PromptForm: ForwardRefRenderFunction<PromptFormRef, PromptFormProps> = (
           rules={[{required: true}]}
         >
           <InputNumber min={10} max={10000} step={10}/>
-        </Form.Item>
-        <Form.Item {...buttonItemLayout}>
-          <Button className={'mr-3'} onClick={() => handlePromptFormEventAspect('cancel')}>取消</Button>
-          <Button onClick={() => handlePromptFormEventAspect('confirm')}>确认</Button>
         </Form.Item>
       </Form>
 

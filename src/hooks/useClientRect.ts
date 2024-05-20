@@ -55,7 +55,7 @@ const useClientRect = (props: IUseClientRectProps) => {
     return () => {
       window.removeEventListener('resize', windowOnResize);
     };
-  }, []);
+  }, [id, clazzName, domRef]);
 
   const windowOnResize = () => {
     let element = null;

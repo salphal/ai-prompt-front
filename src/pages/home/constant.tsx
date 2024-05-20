@@ -47,6 +47,12 @@ export const TABLE_COLUMNS = [
     width: 200,
   },
   {
+    key: PROMPT_ITEM_KEYS.avatar,
+    dataIndex: PROMPT_ITEM_KEYS.avatar,
+    title: PROMPT_ITEM_LABELS.avatar,
+    width: 200,
+  },
+  {
     key: TABLE_KEYS.model,
     dataIndex: TABLE_KEYS.model,
     title: TABLE_LABELS.model,
