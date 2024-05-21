@@ -16,12 +16,11 @@ export interface IPromptMessageForm {
 }
 
 export interface PromptMessageProps {
-  [key: string]: any;
-
   data?: IPromptMessageForm;
-
   onClose?: () => void;
   onChange?: (values: any) => void;
+
+  [key: string]: any;
 }
 
 interface PromptMessageRef {
@@ -74,6 +73,7 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
 
   return (
     <React.Fragment>
+
       <div className={classNames([Styles.promptMessage, 'prompt-message', 'mb-3'])}>
         <div className={classNames(['prompt-message-controller'])}>
           <Radio.Group
@@ -81,13 +81,20 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
             value={formData.role}
             onChange={(e) => roleOnChange(e.target.value)}
           >
-            {PROMPT_ROLES.map(v => (
-              <Radio.Button key={v} value={v}>{v}</Radio.Button>
+            {PROMPT_ROLES.map((v, i) => (
+              <Radio.Button
+                key={v}
+                value={v}
+                style={i === 0 ? {
+                  borderRadius: '3px 3px 0 0'
+                } : i === PROMPT_ROLES.length - 1 ? {
+                  borderRadius: '0 3px 0 0'
+                } : {}}
+              >{v}</Radio.Button>
             ))}
           </Radio.Group>
           <CloseCircleOutlined onClick={promptMessageOnClose}/>
         </div>
-
         <div className={classNames([Styles.content, 'prompt-message-content'])}>
           <TextArea
             value={formData.content}
@@ -95,6 +102,9 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
             autoSize={{
               minRows: 4,
               maxRows: 6
+            }}
+            style={{
+              borderRadius: '0 3px 3px 3px'
             }}
             onChange={(e) => contentOnChange(e.target.value)}
           />
