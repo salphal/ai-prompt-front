@@ -1,13 +1,13 @@
-import { type ReactElement } from 'react';
-import { useRoutes } from 'react-router-dom';
+import {type ReactElement} from 'react';
+import {useRoutes} from 'react-router-dom';
 
-import Home from './home';
+import Home from './index.tsx';
 
 const HomeRoutes = () => {
   const routers: ReactElement | null = useRoutes([
     {
       path: '/',
-      element: <Home />,
+      element: <Home/>,
     },
   ]);
   return routers;
