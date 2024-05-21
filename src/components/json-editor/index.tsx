@@ -1,9 +1,9 @@
-import React, {useEffect, useImperativeHandle, ForwardRefRenderFunction, Ref, useRef} from "react";
+import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useRef} from "react";
 import {Content, ContentErrors, JSONEditor, JSONPatchResult} from "vanilla-jsoneditor";
-import "./index.scss"
 
 /**
  * "vanilla-jsoneditor": "^0.23.0",
+ * https://github.com/josdejong/svelte-jsoneditor
  */
 
 const defaultContent = {
@@ -18,9 +18,12 @@ export interface IJsonEditorContent {     // 二者传一个即可
   text: undefined | string;               // JSON 字符串
 }
 
-export interface JsonEditorProps {
-  [key: string]: any;
+export type TJsonEditorOnChange = (content: Content, previousContent: Content, changeStatus: {
+  contentErrors: ContentErrors | null,
+  patchResult: JSONPatchResult | null
+}) => void;
 
+export interface JsonEditorProps {
   model?: 'text' | 'tree' | 'table';    // 操作模式
   content?: IJsonEditorContent;         // JSON 内容
   readOnly?: boolean;                   // 是否只读
@@ -28,13 +31,10 @@ export interface JsonEditorProps {
   navigationBar?: boolean;              // 是否显示 导航栏
   statusBar?: boolean;                  // 是否显示 状态栏
   tabSize?: number;                     // 缩进大小
-
   onError?: (err: Error) => void;
+  onChange?: TJsonEditorOnChange;
 
-  onChange?: (content: Content, previousContent: Content, changeStatus: {
-    contentErrors: ContentErrors | null,
-    patchResult: JSONPatchResult | null
-  }) => void;
+  [key: string]: any;
 }
 
 interface JsonEditorRef {
@@ -46,7 +46,9 @@ const JsonEditor: ForwardRefRenderFunction<JsonEditorRef, JsonEditorProps> = (
   ref: Ref<JsonEditorRef | HTMLDivElement>
 ) => {
 
-  const {} = props;
+  const {
+    onChange
+  } = props;
 
   const refContainer = useRef<any>(null);
   const refEditor = useRef<any>(null);
@@ -76,15 +78,20 @@ const JsonEditor: ForwardRefRenderFunction<JsonEditorRef, JsonEditorProps> = (
       console.log("update props", props);
       refEditor.current.updateProps({
         content: defaultContent,
+        onChange: jsonEditorOnChange,
         ...props
       });
     }
   }, [props]);
 
+  const jsonEditorOnChange: TJsonEditorOnChange = (updatedContent, previousContent, {contentErrors, patchResult}) => {
+    typeof onChange === 'function' && onChange(updatedContent, previousContent, {contentErrors, patchResult});
+  }
+
   return (
     <React.Fragment>
 
-      <div className="vanilla-jsoneditor-react" ref={refContainer}/>
+      <div className="vanilla-jsoneditor-react" ref={refContainer} style={{height: "100%"}}/>
 
     </React.Fragment>
   );
