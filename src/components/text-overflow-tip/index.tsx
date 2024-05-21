@@ -10,14 +10,18 @@ import React, {
 import {Popover} from "antd";
 import useClientRect from "@/hooks/useClientRect.ts";
 
-const singleLineStyle = (width: number | string = 'auto') => ({
+const singleLineStyle = (width: number | string = 'auto'): any => ({
+  display: 'inline-block',
   maxWidth: width,
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis'
 });
 
-const multiLineStyle = (width: number | string = 'auto', total: number) => ({
+const multiLineStyle = (
+  width: number | string = 'auto',
+  total: number
+): any => ({
   maxWidth: width,
   overflow: 'hidden',
   display: '-webkit-box',
