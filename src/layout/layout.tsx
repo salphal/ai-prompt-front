@@ -1,16 +1,16 @@
 import React, {useEffect} from "react";
-import {
-  ProLayout,
-} from '@ant-design/pro-components';
+import {ProLayout,} from '@ant-design/pro-components';
 import Styles from "./index.module.scss";
 import classNames from "classnames";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export interface LayoutProps {
   [key: string]: any;
 }
 
 const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
+
+  const navigate = useNavigate();
 
   const {pathname} = useLocation();
 
@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
       <ProLayout
         className={classNames([Styles.layout])}
         splitMenus
-        title={"AI Prompt"}
+        title={"AI Prompt Management Platform"}
         logo={null}
         location={{
           pathname,
@@ -48,7 +48,9 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
             </p>
           );
         }}
-        onMenuHeaderClick={(e) => console.log(e)}
+        onMenuHeaderClick={(e) => {
+          navigate('/home');
+        }}
         menuItemRender={(item, dom) => (
           <a
             onClick={() => {
