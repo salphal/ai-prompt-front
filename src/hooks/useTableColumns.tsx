@@ -1,72 +1,104 @@
-import {useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import TextOverflowTip from "@/components/text-overflow-tip";
-import {deconstructObject} from "@/utils/format.ts";
+import JsonViewer from "@/components/json-viewer";
 
 export interface IUseTableColumnsProps {
-	[key: string]: any;
+  columns?: Array<any>;
+  tableData?: Array<any>;
+  operations?: any;
 
-	columns?: Array<any>;
-	tableData?: Array<any>;
-	operations?: any;
+  [key: string]: any;
 }
 
 const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
-	const {
-		tableData,
-		columns,
-		operations = {}
-	} = props;
+  const {
+    tableData,
+    columns,
+    operations = {}
+  } = props;
 
-	const tableColumns = useMemo(() => () => {
+  const [filterColumns, setFilterColumns] = useState<Array<any>>([]);
 
-		let tableColumns = [];
+  useEffect(() => {
+    let columnKeys = [];
 
-		const operationsColumn = {
-			key: 'table-operations-column',
-			title: '操作',
-			width: 200,
-			fixed: 'right' as any,
-			render: (v: any) => v,
-			...operations
-		};
+    if (Array.isArray(columns) && columns.length) {
+      columnKeys = columns.map(column => column.dataIndex);
+    }
 
-		if (Array.isArray(columns) && columns.length) {
-			tableColumns = columns;
-		}
+    if (Array.isArray(tableData) && tableData.length) {
+      columnKeys = Object.keys(tableData[0])
+    }
 
-		if (Array.isArray(tableData) && tableData.length) {
-			const firstRowData = tableData[0];
-			const obj = deconstructObject(firstRowData);
-			const columns = createTableColumns(obj);
-			console.log("=>(useTableColumns.tsx:47) columns", columns);
-			tableColumns = columns;
-		}
+    setFilterColumns(columnKeys);
+  }, [columns, tableData]);
 
-		const blackList = ['id'];
-		tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex)));
+  const tableColumns = useMemo(() => () => {
 
-		return [...tableColumns, operationsColumn];
+    let tableColumns = [];
 
-	}, [tableData]);
+    const operationsColumn = {
+      key: 'table-operations-column',
+      title: '操作',
+      width: 200,
+      fixed: 'right' as any,
+      ...operations
+    };
 
-	const createTableColumns = (obj: { [key: string]: any }) => {
-		if (!Object.keys(obj).length) return [];
-		return Object.keys(obj)
-			.map(v => ({
-				key: v,
-				dataIndex: v,
-				title: v,
-				width: 200,
-				render: (v: any) => String(v)
-			}));
-	};
+    if (Array.isArray(columns) && columns.length) {
+      tableColumns = columns;
+    } else if (Array.isArray(tableData) && tableData.length) {
+      tableColumns = createTableColumns(tableData[0]);
+    }
 
-	const renderTextColumn = (v: any) => <TextOverflowTip width={v.width}>{v}</TextOverflowTip>;
+    const blackList = ['id'];
+    tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
 
-	return {
-		tableColumns: tableColumns()
-	};
+    return tableColumns.length ? [...tableColumns, operationsColumn] : [];
+
+  }, [columns, tableData, filterColumns]);
+
+  const createTableColumns = (obj: { [key: string]: any }) => {
+    if (!Object.keys(obj).length) return [];
+    return Object.keys(obj)
+      .map(column => {
+        const config = {
+          key: column,
+          dataIndex: column,
+          title: column,
+          width: 200,
+        };
+        return {
+          ...config,
+          render: (text: any, record: any, index: number) => renderColumn(config, text, record, index),
+        }
+      });
+  };
+
+  const renderColumn = (config: any, text: any, record: any, index: number) => {
+    if ((typeof text === 'object' && text !== null)) {
+      return renderJsonView(text, config);
+    } else {
+      return renderTextColumn(text, config);
+    }
+  }
+
+  const renderJsonView = (text: any, config: any) =>
+    <TextOverflowTip
+      width={config.width}
+      popRender={() => <JsonViewer src={text}/>}
+      popAble
+    >{JSON.stringify(text)}</TextOverflowTip>;
+
+  const renderTextColumn = (text: any, config: any) =>
+    <TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
+
+  return {
+    filterColumns,
+    setFilterColumns,
+    tableColumns: tableColumns(),
+  };
 };
 
 export default useTableColumns;
