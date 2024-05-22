@@ -8,6 +8,7 @@ import {PROMPT_FORM_KEYS, PROMPT_FORM_LABELS} from "@/pages/edit-prompt/constant
 import {selectFilterOption} from "@/utils/antd/select.ts";
 import useEditPromptStore, {setPromptFormData} from "@/pages/edit-prompt/store.ts";
 import DraggableList from "@/components/draggable-list";
+import {CloseOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined} from '@ant-design/icons';
 import classNames from "classnames";
 
 export interface EditPromptProps {
@@ -40,12 +41,28 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
       const messages = contextData.map((v, i) => ({
         ...v,
         id: i,
-        render: () =>
-          <PromptMessage
-            key={`prompt-${i}`}
-            value={v}
-            onChange={(val: any) => promptMessageOnChange(val, i)}
-          />,
+        render: () => (
+          <div className={classNames(['flex', 'justify-between'])}>
+            <div className={classNames(['flex-1'])}>
+              <PromptMessage
+                key={`prompt-${i}`}
+                value={v}
+                onChange={(val: any) => promptMessageOnChange(val, i)}
+              />
+            </div>
+            <div className={classNames(['pt-12', 'pb-4', 'flex', 'flex-col', 'justify-between', 'w-10'])}>
+              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
+                <CloseOutlined/>
+              </div>
+              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
+                <VerticalAlignTopOutlined/>
+              </div>
+              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
+                <VerticalAlignBottomOutlined/>
+              </div>
+            </div>
+          </div>
+        ),
       }))
       setMessageContext(messages);
     }
