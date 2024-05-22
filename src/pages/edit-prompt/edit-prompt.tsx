@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import PromptMessage from "@/components/prompt-message";
 import {useLocation} from "react-router-dom";
 import {Button, Col, Form, Row, Select} from "antd";
@@ -10,6 +10,8 @@ import useEditPromptStore, {setPromptFormData} from "@/pages/edit-prompt/store.t
 import DraggableList from "@/components/draggable-list";
 import {CloseOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined} from '@ant-design/icons';
 import classNames from "classnames";
+import {v4 as uuidv4} from 'uuid';
+
 
 export interface EditPromptProps {
   [key: string]: any;
@@ -30,45 +32,104 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
 
   const [form] = Form.useForm();
 
-  const [messageContext, setMessageContext] = useState<Array<any>>([]);
+  const [contextList, setContextList] = useState<Array<any>>([]);
 
   useEffect(() => {
     form.setFieldsValue(promptFormData);
   }, [promptFormData]);
 
   useEffect(() => {
-    if (Array.isArray(contextData) && contextData.length) {
-      const messages = contextData.map((v, i) => ({
+    if (Array.isArray(contextData)) setContextList(contextData.map(v => ({...v, id: uuidv4()})));
+  }, []);
+
+  const promptList = useMemo(() => () => {
+    if (!Array.isArray(contextList)) return [];
+    return contextList.map((v: any, i: number) => {
+      const id = v.id || i;
+      return {
+        id,
         ...v,
-        id: i,
         render: () => (
-          <div className={classNames(['flex', 'justify-between'])}>
+          <div
+            key={`prompt-message-${i}`}
+            className={classNames(['flex', 'justify-between'])}
+          >
             <div className={classNames(['flex-1'])}>
               <PromptMessage
-                key={`prompt-${i}`}
                 value={v}
-                onChange={(val: any) => promptMessageOnChange(val, i)}
+                onChange={(val: any) => promptMessageOnChange(val, id)}
               />
             </div>
-            <div className={classNames(['pt-12', 'pb-4', 'flex', 'flex-col', 'justify-between', 'w-10'])}>
-              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
-                <CloseOutlined/>
-              </div>
-              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
-                <VerticalAlignTopOutlined/>
-              </div>
-              <div className={classNames(['flex-1', 'justify-center', 'items-center'])}>
-                <VerticalAlignBottomOutlined/>
-              </div>
+            <div className={classNames(['pt-9', 'pb-5', 'flex', 'flex-col', 'justify-between', 'w-6'])}>
+              {[
+                [<CloseOutlined className={classNames(['text-red-300'])}/>, 'remove'],
+                [<VerticalAlignTopOutlined className={classNames(['text-blue-500'])}/>, 'moveToPrev'],
+                [<VerticalAlignBottomOutlined className={classNames(['text-blue-500'])}/>, 'moveToNext']
+              ].map(([icon, type], i) => (
+                <div
+                  key={i}
+                  className={classNames(['flex-1', 'flex', 'justify-center', 'items-center', 'cursor-pointer', 'hover:bg-gray-200'])}
+                  onClick={() => handleEditPromptEventAspect(type as string, id)}
+                >
+                  {icon}
+                </div>
+              ))}
             </div>
           </div>
         ),
-      }))
-      setMessageContext(messages);
-    }
-  }, [contextData]);
+      }
+    });
+  }, [contextList]);
 
-  const promptMessageOnChange = (val: any, i: number) => {
+  const handleEditPromptEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
+    const handles: any = {
+      add: handleEditPromptOnAdd,
+      remove: handleEditPromptOnRemove,
+      moveToPrev: handleEditPromptOnMoveToPrev,
+      moveToNext: handleEditPromptOnMoveToNext,
+    };
+    args = (Object.keys(kwargs).length || typeof kwargs !== 'object') ? [kwargs, ...args] : args;
+    handles[type] && handles?.[type](...args);
+  };
+
+  const handleEditPromptOnAdd = () => {
+    const message = {
+      id: uuidv4(),
+      role: "user",
+      data: "",
+      content: ""
+    };
+    setContextList(prev => [...prev, message]);
+  };
+
+  const handleEditPromptOnRemove = (id: number) => {
+    setContextList(prev => prev.filter((v, i) => v.id !== id));
+  };
+
+  const handleEditPromptOnMoveToPrev = (id: number) => {
+    console.log("=>(edit-prompt.tsx:119) id", id);
+    console.log("=>(edit-prompt.tsx:112) contextList", contextList);
+    const index = contextList.findIndex(v => v.id === id);
+    console.log("=>(edit-prompt.tsx:113) index", index);
+    if (index === -1 || index === 0) return;
+    setContextList(prev => prev.map((v, i, arr) => {
+      if (i === index - 1) return arr[index];
+      if (i === index) return arr[index - 1];
+      return v;
+    }));
+  };
+
+  const handleEditPromptOnMoveToNext = (id: number) => {
+    const index = contextList.findIndex(v => v.id === id);
+    if (index === -1 || index >= contextList.length) return;
+    setContextList(prev => prev.map((v, i, arr) => {
+      if (i === index + 1) return arr[index];
+      if (i === index) return arr[index + 1];
+      return v;
+    }));
+  };
+
+  const promptMessageOnChange = (val: any, i: string | number) => {
   }
 
   const contextSelectOnChange = (value: string) => {
@@ -83,7 +144,6 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
     <React.Fragment>
 
       <Form
-
         form={form}
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}
@@ -120,14 +180,13 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
         </Row>
       </Form>
 
-
       <DraggableList
-        dataSource={messageContext}
-        setDataSource={setMessageContext}
+        dataSource={promptList()}
+        setDataSource={setContextList}
       />
 
       <div className={classNames(['pl-5', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
-        <Button type={'primary'}>Add Message</Button>
+        <Button type={'primary'} onClick={() => handleEditPromptEventAspect('add')}>Add Message</Button>
       </div>
 
     </React.Fragment>

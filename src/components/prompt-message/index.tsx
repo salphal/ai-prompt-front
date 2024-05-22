@@ -2,7 +2,6 @@ import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, us
 import classNames from "classnames";
 import {Radio} from "antd";
 import {PROMPT_ROLES} from "@/constants/prompt.ts";
-import {CloseCircleOutlined} from "@ant-design/icons";
 import {ERole} from "@/typings/prompt.ts";
 import _ from 'lodash';
 import MarkdownEditor from "@/components/markdown-editor";
@@ -77,7 +76,7 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
     <React.Fragment>
 
       <div
-        className={classNames(['prompt-message', 'flex', 'flex-col', 'p-2', 'mb-4', 'overflow-hidden'])}
+        className={classNames(['prompt-message', 'flex', 'flex-col', 'p-1', 'mb-4', 'overflow-hidden', 'cursor-pointer'])}
         style={{height}}
       >
         <div className={classNames(['flex', 'justify-between'])}>
@@ -98,7 +97,6 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
               >{v}</Radio.Button>
             ))}
           </Radio.Group>
-          <CloseCircleOutlined className={classNames(['mr-3'])} onClick={promptMessageOnClose}/>
         </div>
         <div className={classNames(['flex-1'])}>
           <MarkdownEditor value={formData.content}/>
