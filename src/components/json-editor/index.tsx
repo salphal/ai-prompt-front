@@ -19,8 +19,8 @@ export interface IJsonEditorContent {     // 二者传一个即可
 }
 
 export type TJsonEditorOnChange = (content: Content, previousContent: Content, changeStatus: {
-  contentErrors: ContentErrors | null,
-  patchResult: JSONPatchResult | null
+  changedContent: ContentErrors | null,
+  prevContent: JSONPatchResult | null
 }) => void;
 
 export interface JsonEditorProps {
@@ -33,6 +33,7 @@ export interface JsonEditorProps {
   tabSize?: number;                     // 缩进大小
   onError?: (err: Error) => void;
   onChange?: TJsonEditorOnChange;
+  height?: number | string;
 
   [key: string]: any;
 }
@@ -47,7 +48,8 @@ const JsonEditor: ForwardRefRenderFunction<JsonEditorRef, JsonEditorProps> = (
 ) => {
 
   const {
-    onChange
+    onChange,
+    height = '100%'
   } = props;
 
   const refContainer = useRef<any>(null);
@@ -84,14 +86,14 @@ const JsonEditor: ForwardRefRenderFunction<JsonEditorRef, JsonEditorProps> = (
     }
   }, [props]);
 
-  const jsonEditorOnChange: TJsonEditorOnChange = (updatedContent, previousContent, {contentErrors, patchResult}) => {
-    typeof onChange === 'function' && onChange(updatedContent, previousContent, {contentErrors, patchResult});
+  const jsonEditorOnChange: TJsonEditorOnChange = (updatedContent, previousContent, {changedContent, prevContent}) => {
+    typeof onChange === 'function' && onChange(updatedContent, previousContent, {changedContent, prevContent});
   }
 
   return (
     <React.Fragment>
 
-      <div className="vanilla-jsoneditor-react" ref={refContainer} style={{height: "100%"}}/>
+      <div className="vanilla-jsoneditor-react" ref={refContainer} style={{height: height || "100%"}}/>
 
     </React.Fragment>
   );
