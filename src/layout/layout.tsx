@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
       <ProLayout
         className={classNames([Styles.layout])}
         splitMenus
-        title={"AI Prompt Management Platform"}
+        title={"OpenAI Prompt Management Platform"}
         logo={null}
         location={{
           pathname,
