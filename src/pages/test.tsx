@@ -1,6 +1,4 @@
-import React, {useState, useEffect} from "react";
-import classNames from "classnames";
-import Countdown from "@/utils/count-down.ts";
+import React, {useEffect} from "react";
 
 export interface TestProps {
   [key: string]: any;
@@ -8,23 +6,16 @@ export interface TestProps {
 
 const Test: React.FC<TestProps> = (props: TestProps) => {
 
-  const [count, setCount] = useState(0);
-
   const {} = props
 
   useEffect(() => {
-    const countDown = new Countdown(10, (count: number) => {
-      setCount(count);
-    });
-    countDown.start();
   }, []);
+
 
   return (
     <React.Fragment>
 
-      <div className={classNames([])}>
-        {count}
-      </div>
+      test page
 
     </React.Fragment>
   );
