@@ -1,6 +1,9 @@
-import React, {useEffect} from "react";
+import React, {useState} from "react";
 import JsonEditor from "@/components/json-editor";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import {Button, Flex} from "antd";
+import classNames from "classnames";
+import qs from "query-string";
 
 export interface EditJsonProps {
   [key: string]: any;
@@ -9,21 +12,43 @@ export interface EditJsonProps {
 const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
 
   const location = useLocation();
+  console.log('=>(edit-json.tsx:14) location', location);
+  const navigate = useNavigate();
 
-  const {} = props
+  const [content, setContent] = useState<any>({});
 
-  useEffect(() => {
-  }, []);
+  const handleBackOnClick = () => {
+    navigate('/home');
+  };
+
+  const handleSaveOnClick = () => {
+    const paramsString = location.search.slice(1);
+    const {id} = qs.parse(paramsString);
+    console.log('=>(edit-json.tsx:33) id', id);
+
+  };
+
+  const jsonEditorOnChange = (changedContent: any, prevContent: any) => {
+    if (changedContent.json) setContent(changedContent.json);
+  };
 
   return (
     <React.Fragment>
 
-      <JsonEditor
-        content={{
-          json: location.state,
-          text: undefined
-        }}
-      />
+      <div className={classNames(['h-full'])}>
+        <JsonEditor
+          content={{
+            json: location.state,
+            text: undefined
+          }}
+          onChange={jsonEditorOnChange}
+          height={"calc(100% - 80px)"}
+        />
+        <Flex className={classNames(['h-20'])} justify={'center'} align={'center'}>
+          <Button className={'mr-3'} onClick={handleBackOnClick}>Back</Button>
+          <Button type={'primary'} onClick={handleSaveOnClick}>Save</Button>
+        </Flex>
+      </div>
 
     </React.Fragment>
   );

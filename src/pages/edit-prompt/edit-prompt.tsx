@@ -1,12 +1,14 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import PromptMessage from "@/components/prompt-message";
 import {useLocation} from "react-router-dom";
-import {Col, Form, Row, Select} from "antd";
+import {Button, Col, Form, Row, Select} from "antd";
 import usePromptStore, {setContextData} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {PROMPT_FORM_KEYS, PROMPT_FORM_LABELS} from "@/pages/edit-prompt/constants/form.ts";
 import {selectFilterOption} from "@/utils/antd/select.ts";
 import useEditPromptStore, {setPromptFormData} from "@/pages/edit-prompt/store.ts";
+import DraggableList from "@/components/draggable-list";
+import classNames from "classnames";
 
 export interface EditPromptProps {
   [key: string]: any;
@@ -24,15 +26,33 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
   const {
     promptFormData
   } = useEditPromptStore(useShallow((state: any) => state));
-  console.log("=>(edit-prompt.tsx:27) promptFormData", promptFormData);
 
   const [form] = Form.useForm();
 
-  const {} = props;
+  const [messageContext, setMessageContext] = useState<Array<any>>([]);
 
   useEffect(() => {
     form.setFieldsValue(promptFormData);
   }, [promptFormData]);
+
+  useEffect(() => {
+    if (Array.isArray(contextData) && contextData.length) {
+      const messages = contextData.map((v, i) => ({
+        ...v,
+        id: i,
+        render: () =>
+          <PromptMessage
+            key={`prompt-${i}`}
+            value={v}
+            onChange={(val: any) => promptMessageOnChange(val, i)}
+          />,
+      }))
+      setMessageContext(messages);
+    }
+  }, [contextData]);
+
+  const promptMessageOnChange = (val: any, i: number) => {
+  }
 
   const contextSelectOnChange = (value: string) => {
     setContextData(location.state[value]);
@@ -46,14 +66,15 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
     <React.Fragment>
 
       <Form
+
         form={form}
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}
         labelAlign={'left'}
         onValuesChange={formOnValueChange}
       >
-        <Row gutter={24} justify="start">
-          <Col span={5} >
+        <Row className={classNames(['pl-5'])} gutter={24} justify="start">
+          <Col span={5}>
             <Form.Item name={PROMPT_FORM_KEYS.contextKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contextKey]}>
               <Select
                 onChange={contextSelectOnChange}
@@ -81,7 +102,16 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
           </Col>
         </Row>
       </Form>
-      <PromptMessage/>
+
+
+      <DraggableList
+        dataSource={messageContext}
+        setDataSource={setMessageContext}
+      />
+
+      <div className={classNames(['pl-5', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
+        <Button type={'primary'}>Add Message</Button>
+      </div>
 
     </React.Fragment>
   );
