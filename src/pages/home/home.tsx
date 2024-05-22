@@ -25,15 +25,13 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   ref: Ref<HomeRef | HTMLDivElement>
 ) => {
 
-  const navigate = useNavigate();
-
   const [form] = useForm();
-
-  const {} = props;
-
+  const navigate = useNavigate();
   const {
     promptData,
+    columnKeysOptions
   } = usePromptStore(useShallow((state: any) => state));
+  console.log("=>(home.tsx:35) columnKeysOptions", columnKeysOptions);
 
   const {height: tableHeight} = useClientRect({id: 'table-wrapper'});
   const tableScroll = {
@@ -79,7 +77,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       );
     }
   }
-  const {tableColumns, filterColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
+  const {tableColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
 
   const paginationOnChange = (current: number, pageSize: number) => {
     setPaginationConfig((prev: any) => ({...prev, current, pageSize}));
@@ -123,7 +121,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
         <div className={'flex flex-row justify-between items-center py-2'}>
           <Form form={form} layout={'inline'}>
             <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
-              <Select style={{width: 120}} options={filterColumns.map(k => ({label: k, value: k}))}/>
+              <Select style={{width: 120}} options={columnKeysOptions()}/>
             </Form.Item>
             <Form.Item name={FILTER_KEYS.value} label={FILTER_LABELS[FILTER_KEYS.value]}>
               <Input/>

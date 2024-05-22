@@ -16,7 +16,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-unused-vars": 0,
-    "no-empty-pattern": 1,
+    "no-empty-pattern": 0,
     "no-unused-vars": 0
   },
 }
