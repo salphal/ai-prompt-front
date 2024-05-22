@@ -2,12 +2,10 @@ import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, us
 import classNames from "classnames";
 import {Radio} from "antd";
 import {PROMPT_ROLES} from "@/constants/prompt.ts";
-import TextArea from "antd/es/input/TextArea";
 import {CloseCircleOutlined} from "@ant-design/icons";
-import Styles from "./index.module.scss";
-import "./index.scss";
 import {ERole} from "@/typings/prompt.ts";
 import _ from 'lodash';
+import MarkdownEditor from "@/components/markdown-editor";
 
 export interface IPromptMessageForm {
   role: ERole.user | ERole.system | ERole.assistant;          // 角色: system: 输入, user: 输出, assistant: 上下文
@@ -16,17 +14,16 @@ export interface IPromptMessageForm {
 }
 
 export interface PromptMessageProps {
-  data?: IPromptMessageForm;
+  value?: IPromptMessageForm;
   onClose?: () => void;
   onChange?: (values: any) => void;
+  height?: number;
 
   [key: string]: any;
 }
 
 interface PromptMessageRef {
   [key: string]: any;
-
-
 }
 
 const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessageProps> = (
@@ -34,7 +31,12 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
   ref: Ref<PromptMessageRef | HTMLDivElement>
 ) => {
 
-  const {data, onChange, onClose} = props;
+  const {
+    value,
+    onChange,
+    onClose,
+    height = 240
+  } = props;
 
   const [formData, setFormData] = useState<IPromptMessageForm>({
     role: ERole.user,
@@ -45,10 +47,10 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
   useImperativeHandle(ref, () => ({}));
 
   useEffect(() => {
-    if (!_.isObject(data)) return;
-    const isDiff = diffFormData(data, formData);
-    isDiff && setFormData(data);
-  }, [data]);
+    if (!_.isObject(value)) return;
+    const isDiff = diffFormData(value, formData);
+    isDiff && setFormData(value);
+  }, [value]);
 
   useEffect(() => {
     typeof onChange === 'function' && onChange(formData);
@@ -74,10 +76,13 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
   return (
     <React.Fragment>
 
-      <div className={classNames([Styles.promptMessage, 'prompt-message', 'mb-3'])}>
-        <div className={classNames(['prompt-message-controller'])}>
+      <div
+        className={classNames(['prompt-message', 'flex', 'flex-col', 'p-2', 'mb-4', 'overflow-hidden'])}
+        style={{height}}
+      >
+        <div className={classNames(['flex', 'justify-between'])}>
           <Radio.Group
-            className={classNames(['prompt-message-role'])}
+            className={classNames([])}
             value={formData.role}
             onChange={(e) => roleOnChange(e.target.value)}
           >
@@ -93,21 +98,10 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
               >{v}</Radio.Button>
             ))}
           </Radio.Group>
-          <CloseCircleOutlined onClick={promptMessageOnClose}/>
+          <CloseCircleOutlined className={classNames(['mr-3'])} onClick={promptMessageOnClose}/>
         </div>
-        <div className={classNames([Styles.content, 'prompt-message-content'])}>
-          <TextArea
-            value={formData.content}
-            placeholder=""
-            autoSize={{
-              minRows: 4,
-              maxRows: 6
-            }}
-            style={{
-              borderRadius: '0 3px 3px 3px'
-            }}
-            onChange={(e) => contentOnChange(e.target.value)}
-          />
+        <div className={classNames(['flex-1'])}>
+          <MarkdownEditor value={formData.content}/>
         </div>
       </div>
 
