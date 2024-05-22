@@ -1,4 +1,4 @@
-import React, {useEffect, useImperativeHandle, ForwardRefRenderFunction, Ref, useMemo} from "react";
+import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useMemo} from "react";
 import Styles from "./index.module.scss";
 
 import classNames from "classnames";
@@ -7,16 +7,15 @@ import {HTML5Backend} from "react-dnd-html5-backend";
 import DraggableItem, {IDraggableItem} from "./components/draggable-item";
 
 /**
- * https://github.com/AdolescentJou/react-dnd-demo
  * "react-dnd": "^16.0.1",
  * "react-dnd-html5-backend": "^16.0.1",
+ * https://github.com/AdolescentJou/react-dnd-demo
  */
-
 export interface DraggableListProps {
-  [key: string]: any;
+  dataSource: Array<IDraggableItem>;
+  setDataSource: (dataList: Array<IDraggableItem>) => void;
 
-  dataList: Array<IDraggableItem>;
-  setDataList: (dataList: Array<IDraggableItem>) => void;
+  [key: string]: any;
 }
 
 interface DraggableListRef {
@@ -28,7 +27,7 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
   ref: Ref<DraggableListRef | HTMLDivElement>
 ) => {
 
-  const {dataList, setDataList} = props;
+  const {dataSource, setDataSource} = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -38,22 +37,22 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
 
   const draggableItemOnSwapPlaces = (dragIndex: number, hoverIndex: number) => {
     const min = 0;
-    const max = dataList.length - 1;
+    const max = dataSource.length - 1;
     if (dragIndex < min || dragIndex > max || hoverIndex < min || hoverIndex > max) return;
-    const data = dataList.slice();
+    const data = dataSource.slice();
     const temp = data[dragIndex];
     // 交换位置
     data[dragIndex] = data[hoverIndex];
     data[hoverIndex] = temp;
     // 更新数据
-    setDataList(data);
+    setDataSource(data);
   };
 
   const draggableList = useMemo(() => () => {
-    if (!Array.isArray(dataList) || !dataList.length) {
+    if (!Array.isArray(dataSource) || !dataSource.length) {
       return [];
     }
-    return dataList.map((v: IDraggableItem, i: number) => (
+    return dataSource.map((v: IDraggableItem, i: number) => (
       <DraggableItem
         id={`draggable-item-${i}`}
         key={`draggable-item-${i}`}
@@ -62,7 +61,7 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
         {...v}
       />
     ));
-  }, [dataList])
+  }, [dataSource])
 
   return (
     <React.Fragment>
