@@ -4,103 +4,104 @@ import JsonViewer from "@/components/json-viewer";
 import {setColumnKeys} from "@/store/prompt.ts";
 
 export interface IUseTableColumnsProps {
-	columns?: Array<any>;
-	tableData?: Array<any>;
-	operations?: any;
+  columns?: Array<any>;
+  tableData?: Array<any>;
+  operations?: any;
 
-	[key: string]: any;
+  [key: string]: any;
 }
 
 const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
-	const {
-		tableData,
-		columns,
-		operations = {}
-	} = props;
+  const {
+    tableData,
+    columns,
+    operations = {}
+  } = props;
 
-	const [filterColumns, setFilterColumns] = useState<Array<any>>([]);
+  const [filterColumns, setFilterColumns] = useState<Array<any>>([]);
 
-	useEffect(() => {
-		let columnKeys = [];
+  useEffect(() => {
+    let columnKeys = [];
 
-		if (Array.isArray(columns) && columns.length) {
-			columnKeys = columns.map(column => column.dataIndex);
-		}
+    if (Array.isArray(columns) && columns.length) {
+      columnKeys = columns.map(column => column.dataIndex);
+    }
 
-		if (Array.isArray(tableData) && tableData.length) {
-			columnKeys = Object.keys(tableData[0]);
-		}
+    if (Array.isArray(tableData) && tableData.length) {
+      columnKeys = Object.keys(tableData[0]);
+    }
 
-		setFilterColumns(columnKeys);
-		setColumnKeys(columnKeys);
-	}, [columns, tableData]);
+    setFilterColumns(columnKeys);
+    setColumnKeys(columnKeys);
+  }, [columns, tableData]);
 
-	const tableColumns = useMemo(() => () => {
+  const tableColumns = useMemo(() => () => {
 
-		let tableColumns = [];
+    let tableColumns = [];
 
-		const operationsColumn = {
-			key: 'table-operations-column',
-			title: 'operations',
-			width: 200,
-			fixed: 'right' as any,
-			...operations
-		};
+    const operationsColumn = {
+      key: 'table-operations-column',
+      title: 'operations',
+      width: 200,
+      fixed: 'right' as any,
+      ...operations
+    };
 
-		if (Array.isArray(columns) && columns.length) {
-			tableColumns = columns;
-		} else if (Array.isArray(tableData) && tableData.length) {
-			tableColumns = createTableColumns(tableData[0]);
-		}
+    if (Array.isArray(columns) && columns.length) {
+      tableColumns = columns;
+    } else if (Array.isArray(tableData) && tableData.length) {
+      tableColumns = createTableColumns(tableData[0]);
+    }
 
-		const blackList = ['id'];
-		tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
+    const blackList = ['id'];
+    tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
 
-		return tableColumns.length ? [...tableColumns, operationsColumn] : [];
+    return tableColumns.length ? [...tableColumns, operationsColumn] : [];
 
-	}, [columns, tableData, filterColumns]);
+  }, [columns, tableData, filterColumns]);
 
-	const createTableColumns = (obj: { [key: string]: any }) => {
-		if (!Object.keys(obj).length) return [];
-		return Object.keys(obj)
-			.map(column => {
-				const config = {
-					key: column,
-					dataIndex: column,
-					title: column,
-					width: 200,
-				};
-				return {
-					...config,
-					render: (text: any, record: any, index: number) => renderColumn(config, text, record, index),
-				}
-			});
-	};
+  const createTableColumns = (obj: { [key: string]: any }) => {
+    if (!Object.keys(obj).length) return [];
+    return Object.entries(obj)
+      .map(([key, val]) => {
+        const config = {
+          key: key,
+          dataIndex: key,
+          title: key,
+          width: 200,
+          editable: typeof val !== 'object',
+        };
+        return {
+          ...config,
+          render: (text: any, record: any, index: number) => renderColumn(config, text, record, index),
+        }
+      });
+  };
 
-	const renderColumn = (config: any, text: any, record: any, index: number) => {
-		if ((typeof text === 'object' && text !== null)) {
-			return renderJsonView(text, config);
-		} else {
-			return renderTextColumn(text, config);
-		}
-	}
+  const renderColumn = (config: any, text: any, record: any, index: number) => {
+    if ((typeof text === 'object' && text !== null)) {
+      return renderJsonView(text, config);
+    } else {
+      return renderTextColumn(text, config);
+    }
+  }
 
-	const renderJsonView = (text: any, config: any) =>
-		<TextOverflowTip
-			width={config.width}
-			popRender={() => <JsonViewer name={config.dataIndex} src={text}/>}
-			popAble
-		>{JSON.stringify(text)}</TextOverflowTip>;
+  const renderJsonView = (text: any, config: any) =>
+    <TextOverflowTip
+      width={config.width}
+      popRender={() => <JsonViewer name={config.dataIndex} src={text}/>}
+      popAble
+    >{JSON.stringify(text)}</TextOverflowTip>;
 
-	const renderTextColumn = (text: any, config: any) =>
-		<TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
+  const renderTextColumn = (text: any, config: any) =>
+    <TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
 
-	return {
-		filterColumns,
-		setFilterColumns,
-		tableColumns: tableColumns(),
-	};
+  return {
+    filterColumns,
+    setFilterColumns,
+    tableColumns: tableColumns(),
+  };
 };
 
 export default useTableColumns;
