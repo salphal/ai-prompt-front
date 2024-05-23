@@ -1,14 +1,12 @@
 import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
 import classNames from "classnames";
-import {Button, Form, Input, Pagination, Select, Upload} from "antd";
+import {Button, Form, Input, Pagination, Select} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
-import {DownloadOutlined, FilterOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
-import useUpload from "@/hooks/useUpload.ts";
+import {CopyOutlined, DeleteOutlined, FilterOutlined, MergeCellsOutlined, PlusOutlined} from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
 import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
-import {v4 as uuidv4} from 'uuid';
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
 import useHomeStore, {setHomeFormData} from "@/pages/home/store.ts";
@@ -65,10 +63,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }
   const {tableColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
 
-  const {uploadProps, fileContent, onExportFile} = useUpload({
-    onBefore: () => false
-  });
-
   const [paginationConfig, setPaginationConfig] = useState<any>({
     current: 1,
     pageSize: 100,
@@ -83,12 +77,12 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     form.setFieldsValue(homeFormData);
   }, [homeFormData])
 
-  useEffect(() => {
-    if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
-    const data = fileContent.content.map((v: any) => ({...v, ...v.modelConfig, id: uuidv4()}));
-    setPromptData(data);
-    setPaginationConfig((p: any) => ({...p, total: data.length}));
-  }, [fileContent]);
+  // useEffect(() => {
+  //   if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
+  //   const data = fileContent.content.map((v: any) => ({...v, ...v.modelConfig, id: uuidv4()}));
+  //   setPromptData(data);
+  //   setPaginationConfig((p: any) => ({...p, total: data.length}));
+  // }, [fileContent]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -107,8 +101,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const handlePromptEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
     const handles: any = {
       search: handlePromptOnSearch,
-      export: handlePromptOnExport,
-      reset: handlePromptOnReset,
       edit: handlePromptOnEdit,
       prompt: handlePromptOnPrompt
     };
@@ -117,10 +109,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const handlePromptOnSearch = () => {
-  };
-
-  const handlePromptOnExport = () => {
-    onExportFile(fileContent);
   };
 
   const handlePromptOnReset = () => {
@@ -143,7 +131,21 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     <React.Fragment>
 
       <div className={'flex flex-col justify-between h-full'}>
-        <div className={'flex flex-row justify-between items-center py-2'}>
+        {/*<div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>*/}
+        {/*  <Upload {...uploadProps}>*/}
+        {/*    <Button className={'mr-3'} icon={< DownloadOutlined/>}>Import</Button>*/}
+        {/*  </Upload>*/}
+        {/*  <Button*/}
+        {/*    className={'mr-3'}*/}
+        {/*    icon={<UploadOutlined/>}*/}
+        {/*    onClick={() => handlePromptEventAspect('export')}*/}
+        {/*  >Export</Button>*/}
+        {/*  <Button*/}
+        {/*    icon={<RedoOutlined/>}*/}
+        {/*    onClick={() => handlePromptEventAspect('reset')}*/}
+        {/*  >Reset</Button>*/}
+        {/*</div>*/}
+        <div className={classNames(['flex', 'flex-row', 'justify-between', 'items-center'])}>
           <Form form={form} layout={'inline'} onValuesChange={formOnValueChange}>
             <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
               <Select style={{width: 120}} options={columnKeysOptions()}/>
@@ -155,30 +157,27 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               <Button type={'primary'} ghost>搜索</Button>
             </Form.Item>
           </Form>
-          <div className={'flex flex-row'}>
-            <Upload {...uploadProps}>
-              <Button className={'mr-3'} icon={< DownloadOutlined/>}>Import</Button>
-            </Upload>
+          <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
             <Button
               className={'mr-3'}
-              icon={<UploadOutlined/>}
-              onClick={() => handlePromptEventAspect('export')}
-            >Export</Button>
-            {/*<Button*/}
-            {/*  className={'mr-3'}*/}
-            {/*  icon={<CopyOutlined/>}*/}
-            {/*  onClick={() => handlePromptEventAspect('copy')}*/}
-            {/*>Copy</Button>*/}
-            {/*<Button*/}
-            {/*  className={'mr-3'}*/}
-            {/*  icon={<MergeCellsOutlined/>}*/}
-            {/*  onClick={() => handlePromptEventAspect('merge')}*/}
-            {/*>Merge</Button>*/}
+              icon={<PlusOutlined/>}
+              onClick={() => handlePromptEventAspect('copy')}
+            >Add</Button>
             <Button
               className={'mr-3'}
-              icon={<RedoOutlined/>}
-              onClick={() => handlePromptEventAspect('reset')}
-            >Reset</Button>
+              icon={<CopyOutlined/>}
+              onClick={() => handlePromptEventAspect('copy')}
+            >Copy</Button>
+            <Button
+              className={'mr-3'}
+              icon={<MergeCellsOutlined/>}
+              onClick={() => handlePromptEventAspect('merge')}
+            >Merge</Button>
+            <Button
+              className={'mr-3'}
+              icon={<DeleteOutlined/>}
+              onClick={() => handlePromptEventAspect('merge')}
+            >Remove</Button>
             <Button
               icon={<FilterOutlined/>}
               onClick={() => handlePromptEventAspect('filter')}
@@ -207,6 +206,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             showQuickJumper
           />
         </div>
+
       </div>
 
     </React.Fragment>
