@@ -1,4 +1,4 @@
-import { StateStorage } from "zustand/middleware";
+import {StateStorage} from "zustand/middleware";
 
 export interface ZustandStore {
   setState: (...arg: any[]) => void
@@ -26,16 +26,16 @@ const isZustandStore = (store: any) => {
  *    - 注意: 会失去解构对象上的私有成员
  */
 export const setStoreProperties = (
-    store: ZustandStore | null = null,
-    key: string,
-    value: any,
-    merge = true,
-    insertBefore = false,
-    isDeconstruct = false
+  store: ZustandStore | null = null,
+  key: string,
+  value: any,
+  merge = true,
+  insertBefore = false,
+  isDeconstruct = false
 ) => {
   if (!store || !isZustandStore(store)) return
   /** 解决解构丢失私有成员 */
-  if (!isDeconstruct) {
+  if (isDeconstruct) {
     store.setState((prev: any) => ({
       ...prev,
       [key]: value
@@ -46,17 +46,17 @@ export const setStoreProperties = (
     store.setState((prev: any) => ({
       ...prev,
       [key]: merge
-          ? { ...prev[key], ...value }
-          : { ...value }
+        ? {...prev[key], ...value}
+        : {...value}
     }))
   } else if (isZustandArray(value)) {
     store.setState((prev: any) => ({
       ...prev,
       [key]: merge
-          ? !insertBefore
-              ? [...prev[key], ...value]
-              : [...value, ...prev[key]]
-          : value
+        ? !insertBefore
+          ? [...prev[key], ...value]
+          : [...value, ...prev[key]]
+        : value
     }))
   } else if (isZustandFunc(value)) {
     store.setState((prev: any) => ({
