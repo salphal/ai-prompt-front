@@ -1,25 +1,43 @@
-import React, {useEffect, useImperativeHandle, ForwardRefRenderFunction, Ref, useRef, ReactNode} from "react";
-import Styles from "./index.module.scss";
-
-import classNames from "classnames";
-import {useDrag, useDrop} from "react-dnd";
+/** @jsxImportSource @emotion/react */
+import React, {ForwardRefRenderFunction, ReactNode, Ref, useEffect, useImperativeHandle, useRef} from "react";
 import {HolderOutlined} from '@ant-design/icons';
+import {useDrag, useDrop} from "react-dnd";
+import classNames from "classnames";
+import {css} from '@emotion/react';
+
+const draggableItemStyle = {
+  display: 'flex',
+  flexFlow: 'row nowrap',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+}
+
+const draggableItemDragIconStyle: any = css`
+  &:active {
+    cursor: grab;
+  }
+`;
+
+const draggableItemContentStyle = {
+  flex: 1
+}
 
 export type TDraggableItemRender = (...record: any[]) => ReactNode;
 
 export interface IDraggableItem {
-  [key: string]: any;
-
   id?: string;
   render: ReactNode | TDraggableItemRender;
+
+  [key: string]: any;
 }
 
 export interface DraggableItemProps {
-  [key: string]: any;
-
   id: string;
   index: number;
   onSwapPlaces: (dragIndex: number, hoverIndex: number) => void;
+
+  [key: string]: any;
 }
 
 interface DraggableItemRef {
@@ -73,14 +91,15 @@ const DraggableItem: ForwardRefRenderFunction<DraggableItemRef, DraggableItemPro
     <React.Fragment>
 
       <div
-        className={classNames([Styles.draggableItem])}
+        className={classNames([])}
         ref={drag(drop(draggableItemRef)) as any} // 这样写可以让它即接收拖拽又实现拖拽
         style={{
           opacity: isDragging ? 0.3 : 1,
+          ...draggableItemStyle
         }}
       >
-        <HolderOutlined className={Styles.draggableItemDragIcon}/>
-        <div className={Styles.draggableItemContent}>
+        <HolderOutlined css={draggableItemDragIconStyle}/>
+        <div style={draggableItemContentStyle}>
           {typeof render === 'function' ? render(props) : render}
         </div>
       </div>

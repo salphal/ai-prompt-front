@@ -76,7 +76,7 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
     <React.Fragment>
 
       <div
-        className={classNames(['prompt-message', 'flex', 'flex-col', 'p-1', 'mb-4', 'overflow-hidden', 'cursor-pointer'])}
+        className={classNames(['flex', 'flex-col', 'p-1', 'mb-4', 'overflow-hidden', 'cursor-grab'])}
         style={{height}}
       >
         <div className={classNames(['flex', 'justify-between'])}>

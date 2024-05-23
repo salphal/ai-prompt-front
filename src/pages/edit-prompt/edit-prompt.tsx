@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import PromptMessage from "@/components/prompt-message";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Col, Form, Row, Select} from "antd";
 import usePromptStore, {setContextData} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
@@ -11,6 +11,7 @@ import DraggableList from "@/components/draggable-list";
 import {CloseOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined} from '@ant-design/icons';
 import classNames from "classnames";
 import {v4 as uuidv4} from 'uuid';
+import useScroll from "@/hooks/useScroll.ts";
 
 
 export interface EditPromptProps {
@@ -20,6 +21,8 @@ export interface EditPromptProps {
 const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
 
   const location = useLocation();
+  const navigate = useNavigate();
+
   const {
     columnKeysOptions,
     contextKeysOptions,
@@ -29,6 +32,8 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
   const {
     promptFormData
   } = useEditPromptStore(useShallow((state: any) => state));
+
+  const {scrollToBottom} = useScroll({querySelector: '#draggable-list', isShow: true})
 
   const [form] = Form.useForm();
 
@@ -67,8 +72,8 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
                 [<VerticalAlignBottomOutlined className={classNames(['text-blue-500'])}/>, 'moveToNext']
               ].map(([icon, type], i) => (
                 <div
-                  key={i}
-                  className={classNames(['flex-1', 'flex', 'justify-center', 'items-center', 'cursor-pointer', 'hover:bg-gray-200'])}
+                  key={id + i}
+                  className={classNames(['flex-1', 'flex', 'justify-center', 'items-center', 'cursor-cursor', 'hover:bg-gray-200'])}
                   onClick={() => handleEditPromptEventAspect(type as string, id)}
                 >
                   {icon}
@@ -87,6 +92,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
       remove: handleEditPromptOnRemove,
       moveToPrev: handleEditPromptOnMoveToPrev,
       moveToNext: handleEditPromptOnMoveToNext,
+      back: handleEditPromptOnMoveToBack,
     };
     args = (Object.keys(kwargs).length || typeof kwargs !== 'object') ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
@@ -100,6 +106,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
       content: ""
     };
     setContextList(prev => [...prev, message]);
+    scrollToBottom();
   };
 
   const handleEditPromptOnRemove = (id: number) => {
@@ -107,10 +114,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
   };
 
   const handleEditPromptOnMoveToPrev = (id: number) => {
-    console.log("=>(edit-prompt.tsx:119) id", id);
-    console.log("=>(edit-prompt.tsx:112) contextList", contextList);
     const index = contextList.findIndex(v => v.id === id);
-    console.log("=>(edit-prompt.tsx:113) index", index);
     if (index === -1 || index === 0) return;
     setContextList(prev => prev.map((v, i, arr) => {
       if (i === index - 1) return arr[index];
@@ -129,6 +133,10 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
     }));
   };
 
+  const handleEditPromptOnMoveToBack = () => {
+    navigate('/home');
+  }
+
   const promptMessageOnChange = (val: any, i: string | number) => {
   }
 
@@ -143,50 +151,63 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
   return (
     <React.Fragment>
 
-      <Form
-        form={form}
-        labelCol={{span: 8}}
-        wrapperCol={{span: 16}}
-        labelAlign={'left'}
-        onValuesChange={formOnValueChange}
-      >
-        <Row className={classNames(['pl-5'])} gutter={24} justify="start">
-          <Col span={5}>
-            <Form.Item name={PROMPT_FORM_KEYS.contextKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contextKey]}>
-              <Select
-                onChange={contextSelectOnChange}
-                options={columnKeysOptions()}
-                filterOption={selectFilterOption}
-                showSearch
-                allowClear
-              />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name={PROMPT_FORM_KEYS.roleKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.roleKey]}>
-              <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name={PROMPT_FORM_KEYS.contentKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contentKey]}>
-              <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>
-              <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <div className={classNames(['h-full', 'flex', 'flex-col', 'flex-nowrap'])}>
 
-      <DraggableList
-        dataSource={promptList()}
-        setDataSource={setContextList}
-      />
+        <Form
+          form={form}
+          labelCol={{span: 8}}
+          wrapperCol={{span: 16}}
+          labelAlign={'left'}
+          onValuesChange={formOnValueChange}
+        >
+          <Row className={classNames(['pl-5'])} gutter={24} justify="start">
+            <Col span={5}>
+              <Form.Item name={PROMPT_FORM_KEYS.contextKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contextKey]}>
+                <Select
+                  onChange={contextSelectOnChange}
+                  options={columnKeysOptions()}
+                  filterOption={selectFilterOption}
+                  showSearch
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col span={4}>
+              <Form.Item name={PROMPT_FORM_KEYS.roleKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.roleKey]}>
+                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
+              </Form.Item>
+            </Col>
+            <Col span={4}>
+              <Form.Item name={PROMPT_FORM_KEYS.contentKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contentKey]}>
+                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
+              </Form.Item>
+            </Col>
+            <Col span={4}>
+              <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>
+                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
 
-      <div className={classNames(['pl-5', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
-        <Button type={'primary'} onClick={() => handleEditPromptEventAspect('add')}>Add Message</Button>
+        <DraggableList
+          dataSource={promptList()}
+          setDataSource={setContextList}
+        />
+
+        <div className={classNames(['pr-16', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
+          <Button
+            className={classNames(['mr-3'])}
+            onClick={() => handleEditPromptEventAspect('back')}
+          >Back</Button>
+          <Button
+            className={classNames(['mr-3'])}
+            type={'primary'}
+            onClick={() => handleEditPromptEventAspect('add')}
+          >Add</Button>
+          <Button type={'primary'} onClick={() => handleEditPromptEventAspect('add')}>Save</Button>
+        </div>
+
       </div>
 
     </React.Fragment>

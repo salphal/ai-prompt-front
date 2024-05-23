@@ -1,10 +1,17 @@
 import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useMemo} from "react";
-import Styles from "./index.module.scss";
-
 import classNames from "classnames";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import DraggableItem, {IDraggableItem} from "./components/draggable-item";
+import DraggableItem, {IDraggableItem} from "./draggable-item.tsx";
+
+const draggableListStyle = {
+  display: 'flex',
+  overflow: 'hidden auto',
+  padding: '20px 20px 0 0',
+  flexFlow: 'column nowrap',
+  height: '100%',
+  width: '100%',
+}
 
 /**
  * "react-dnd": "^16.0.1",
@@ -14,6 +21,7 @@ import DraggableItem, {IDraggableItem} from "./components/draggable-item";
 export interface DraggableListProps {
   dataSource: Array<IDraggableItem>;
   setDataSource: (dataList: Array<IDraggableItem>) => void;
+  clazzNames: string[];
 
   [key: string]: any;
 }
@@ -27,7 +35,11 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
   ref: Ref<DraggableListRef | HTMLDivElement>
 ) => {
 
-  const {dataSource, setDataSource} = props;
+  const {
+    dataSource,
+    setDataSource,
+    clazzNames = []
+  } = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -54,8 +66,8 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
     }
     return dataSource.map((v: IDraggableItem, i: number) => (
       <DraggableItem
-        id={`draggable-item-${i}`}
-        key={`draggable-item-${i}`}
+        id={v.id}
+        key={`draggable-item-${v.id}`}
         index={i}
         onSwapPlaces={draggableItemOnSwapPlaces}
         {...v}
@@ -67,7 +79,11 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
     <React.Fragment>
 
       <DndProvider backend={HTML5Backend}>
-        <div className={classNames([Styles.draggableList])}>
+        <div
+          id={'draggable-list'}
+          className={classNames([...clazzNames])}
+          style={draggableListStyle}
+        >
           {draggableList()}
         </div>
       </DndProvider>

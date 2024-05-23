@@ -45,11 +45,8 @@ const getElementRect = (dom: Element) => {
 };
 
 interface IUseScroll {
-  [key: string]: any;
-
   /** 有且仅当该元素显示的时候才执行( 在弹窗中时 ) */
   isShow: boolean;
-
   /** HTML元素 */
   htmlElement?: HTMLElement;
   /** useRef<Element>() */
@@ -58,11 +55,12 @@ interface IUseScroll {
   querySelector?: string;
   /** 滚动条到底部的最小偏移量 */
   minOffsetHeight?: number;
-
   /** 元素滚动事件 */
   onScroll?: () => void;
   /** 元素滚动条到底部事件 */
   onTouchToBottom?: () => void;
+
+  [key: string]: any;
 }
 
 const useScroll = (kwargs: IUseScroll) => {
@@ -75,8 +73,10 @@ const useScroll = (kwargs: IUseScroll) => {
     isShow = false,
     minOffsetHeight = 0,
 
-    onScroll = () => {},
-    onTouchToBottom = () => {},
+    onScroll = () => {
+    },
+    onTouchToBottom = () => {
+    },
   } = kwargs;
 
   const domRef = useRef<Element | null>(null);
@@ -87,6 +87,9 @@ const useScroll = (kwargs: IUseScroll) => {
 
     const dom = getHtmlElement(htmlElementRef || htmlElement || querySelector);
     if (!isElement(dom)) return;
+
+    const {rect} = getElementRect(dom as Element);
+    domRectRef.current = rect;
 
     domRef.current = dom;
     dom!.addEventListener('scroll', domOnScroll);
@@ -101,11 +104,9 @@ const useScroll = (kwargs: IUseScroll) => {
 
     isFunction(onScroll) && onScroll();
 
-    const {rect, scrollTop, scrollHeight} = getElementRect(
-      domRef.current as Element
-    );
-
+    const {rect, scrollTop, scrollHeight} = getElementRect(domRef.current as Element);
     const {height} = rect;
+
     domRectRef.current = rect;
 
     // The scroll bar touches the bottom
@@ -132,11 +133,8 @@ const useScroll = (kwargs: IUseScroll) => {
   };
 
   const scrollToBottom = () => {
-    if (
-      domRef.current instanceof Element &&
-      domRectRef.current instanceof DOMRect
-    ) {
-      const y = domRectRef.current.top + domRef.current.scrollTop;
+    if (domRef.current instanceof Element) {
+      const y = domRef.current.scrollHeight;
       scrollTo(0, y);
     }
   };

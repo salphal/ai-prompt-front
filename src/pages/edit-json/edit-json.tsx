@@ -12,7 +12,6 @@ export interface EditJsonProps {
 const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
 
   const location = useLocation();
-  console.log('=>(edit-json.tsx:14) location', location);
   const navigate = useNavigate();
 
   const [content, setContent] = useState<any>({});
@@ -24,8 +23,6 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
   const handleSaveOnClick = () => {
     const paramsString = location.search.slice(1);
     const {id} = qs.parse(paramsString);
-    console.log('=>(edit-json.tsx:33) id', id);
-
   };
 
   const jsonEditorOnChange = (changedContent: any, prevContent: any) => {
