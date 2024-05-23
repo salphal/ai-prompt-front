@@ -134,7 +134,7 @@ const useScroll = (kwargs: IUseScroll) => {
 
   const scrollToBottom = () => {
     if (domRef.current instanceof Element) {
-      const y = domRef.current.scrollHeight;
+      const y = domRef.current.scrollHeight + 999;
       scrollTo(0, y);
     }
   };
