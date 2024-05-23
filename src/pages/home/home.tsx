@@ -3,10 +3,10 @@ import classNames from "classnames";
 import {Button, Form, Input, Pagination, Select, Upload} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
-import {DownloadOutlined, FilterOutlined, MergeCellsOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
+import {DownloadOutlined, FilterOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
 import useUpload from "@/hooks/useUpload.ts";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
-import usePromptStore, {setPromptData} from "@/store/prompt.ts";
+import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {v4 as uuidv4} from 'uuid';
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
@@ -124,7 +124,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const handlePromptOnReset = () => {
-    setPromptData([]);
+    resetPromptData();
   };
 
   const handlePromptOnEdit = (record: any) => {
@@ -164,11 +164,16 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               icon={<UploadOutlined/>}
               onClick={() => handlePromptEventAspect('export')}
             >Export</Button>
-            <Button
-              className={'mr-3'}
-              icon={<MergeCellsOutlined/>}
-              onClick={() => handlePromptEventAspect('merge')}
-            >Merge</Button>
+            {/*<Button*/}
+            {/*  className={'mr-3'}*/}
+            {/*  icon={<CopyOutlined/>}*/}
+            {/*  onClick={() => handlePromptEventAspect('copy')}*/}
+            {/*>Copy</Button>*/}
+            {/*<Button*/}
+            {/*  className={'mr-3'}*/}
+            {/*  icon={<MergeCellsOutlined/>}*/}
+            {/*  onClick={() => handlePromptEventAspect('merge')}*/}
+            {/*>Merge</Button>*/}
             <Button
               className={'mr-3'}
               icon={<RedoOutlined/>}
