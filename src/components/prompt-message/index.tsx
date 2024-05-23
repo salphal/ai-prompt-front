@@ -33,7 +33,6 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
   const {
     value,
     onChange,
-    onClose,
     height = 240
   } = props;
 
@@ -51,20 +50,14 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
     isDiff && setFormData(value);
   }, [value]);
 
-  useEffect(() => {
-    typeof onChange === 'function' && onChange(formData);
-  }, [formData])
-
-  const promptMessageOnClose = () => {
-    typeof onClose === 'function' && onClose();
-  };
-
   const roleOnChange = (value: ERole) => {
-    setFormData(prev => ({...prev, role: value}))
+    setFormData(prev => ({...prev, role: value}));
+    typeof onChange === 'function' && onChange({...formData, role: value});
   };
 
   const contentOnChange = (value: string) => {
-    setFormData(prev => ({...prev, content: value}))
+    setFormData(prev => ({...prev, content: value}));
+    typeof onChange === 'function' && onChange({...formData, content: value});
   };
 
   const diffFormData = (data: any, formData: IPromptMessageForm) => {
@@ -76,7 +69,7 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
     <React.Fragment>
 
       <div
-        className={classNames(['flex', 'flex-col', 'p-1', 'mb-4', 'overflow-hidden', 'cursor-grab'])}
+        className={classNames(['flex', 'flex-col', 'p-1', 'pb-4', 'overflow-hidden', 'cursor-grab'])}
         style={{height}}
       >
         <div className={classNames(['flex', 'justify-between'])}>
@@ -99,7 +92,7 @@ const PromptMessage: ForwardRefRenderFunction<PromptMessageRef, PromptMessagePro
           </Radio.Group>
         </div>
         <div className={classNames(['flex-1'])}>
-          <MarkdownEditor value={formData.content}/>
+          <MarkdownEditor value={formData.content} onChange={contentOnChange}/>
         </div>
       </div>
 
