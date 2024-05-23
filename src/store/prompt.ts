@@ -1,18 +1,17 @@
 import {create} from 'zustand';
 import {createJSONStorage, persist} from "zustand/middleware";
 import {setStoreProperties} from "@/utils/zustand.ts";
-import {isObject} from "@/utils/is-type.ts";
 import {createSelectOptions} from "@/utils/antd/select.ts";
 
 export interface IPromptStore {
-  [key: string]: any
-
   /** */
   promptData: Array<any>;
   /** */
   columnKeys: Array<any>;
   /** */
-  contextData:  Array<any>;
+  contextData: Array<any>;
+
+  [key: string]: any
 }
 
 export const initialPromptData = {
@@ -62,11 +61,17 @@ export const setPromptProperty = (
 export const setPromptData = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('promptData', value, merge, insertBefore, isDeconstruct);
 
+export const setPromptContextById = (id: any, value: any) =>
+  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
+
 export const setColumnKeys = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);
 
 export const setContextData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-   setPromptProperty('contextData', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
+  setPromptProperty('contextData', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
+
+export const resetPromptData = () =>
+  setPromptProperty('promptData', initialPromptData.promptData, false);
 
 export const resetPromptStore = () =>
   usePromptStore.setState({...initialPromptData});
