@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import PromptMessage from "@/components/prompt-message";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Col, Form, Row, Select} from "antd";
-import usePromptStore, {setContextData} from "@/store/prompt.ts";
+import usePromptStore, {setContextData, setPromptContextById} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {PROMPT_FORM_KEYS, PROMPT_FORM_LABELS} from "@/pages/edit-prompt/constants/form.ts";
 import {selectFilterOption} from "@/utils/antd/select.ts";
@@ -12,7 +12,7 @@ import {CloseOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined} fr
 import classNames from "classnames";
 import {v4 as uuidv4} from 'uuid';
 import useScroll from "@/hooks/useScroll.ts";
-
+import qs from "query-string";
 
 export interface EditPromptProps {
   [key: string]: any;
@@ -37,19 +37,27 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
 
   const [form] = Form.useForm();
 
-  const [contextList, setContextList] = useState<Array<any>>([]);
+  const [messageList, setMessageList] = useState<Array<any>>([]);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     form.setFieldsValue(promptFormData);
+    const contextKey = promptFormData[PROMPT_FORM_KEYS.contextKey] || '';
+    contextKey && setContextData(location.state[contextKey]);
   }, [promptFormData]);
 
   useEffect(() => {
-    if (Array.isArray(contextData)) setContextList(contextData.map(v => ({...v, id: uuidv4()})));
-  }, []);
+    if (!Array.isArray(contextData)) return;
+    setMessageList(contextData.map(v => ({...v, id: uuidv4()})));
+  }, [contextData]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [refreshCount]);
 
   const promptList = useMemo(() => () => {
-    if (!Array.isArray(contextList)) return [];
-    return contextList.map((v: any, i: number) => {
+    if (!Array.isArray(messageList)) return [];
+    return messageList.map((v: any, i: number) => {
       const id = v.id || i;
       return {
         id,
@@ -84,7 +92,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
         ),
       }
     });
-  }, [contextList]);
+  }, [messageList]);
 
   const handleEditPromptEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
     const handles: any = {
@@ -92,7 +100,8 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
       remove: handleEditPromptOnRemove,
       moveToPrev: handleEditPromptOnMoveToPrev,
       moveToNext: handleEditPromptOnMoveToNext,
-      back: handleEditPromptOnMoveToBack,
+      back: handleEditPromptOnBack,
+      save: handleEditPromptOnSave,
     };
     args = (Object.keys(kwargs).length || typeof kwargs !== 'object') ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
@@ -105,18 +114,18 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
       data: "",
       content: ""
     };
-    setContextList(prev => [...prev, message]);
-    scrollToBottom();
+    setMessageList(prev => [...prev, message]);
+    setRefreshCount(p => ++p);
   };
 
   const handleEditPromptOnRemove = (id: number) => {
-    setContextList(prev => prev.filter((v, i) => v.id !== id));
+    setMessageList(prev => prev.filter((v, i) => v.id !== id));
   };
 
   const handleEditPromptOnMoveToPrev = (id: number) => {
-    const index = contextList.findIndex(v => v.id === id);
+    const index = messageList.findIndex(v => v.id === id);
     if (index === -1 || index === 0) return;
-    setContextList(prev => prev.map((v, i, arr) => {
+    setMessageList(prev => prev.map((v, i, arr) => {
       if (i === index - 1) return arr[index];
       if (i === index) return arr[index - 1];
       return v;
@@ -124,21 +133,33 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
   };
 
   const handleEditPromptOnMoveToNext = (id: number) => {
-    const index = contextList.findIndex(v => v.id === id);
-    if (index === -1 || index >= contextList.length) return;
-    setContextList(prev => prev.map((v, i, arr) => {
+    const index = messageList.findIndex(v => v.id === id);
+    if (index === -1 || index >= messageList.length) return;
+    setMessageList(prev => prev.map((v, i, arr) => {
       if (i === index + 1) return arr[index];
       if (i === index) return arr[index + 1];
       return v;
     }));
   };
 
-  const handleEditPromptOnMoveToBack = () => {
+  const handleEditPromptOnBack = () => {
     navigate('/home');
-  }
+  };
 
-  const promptMessageOnChange = (val: any, i: string | number) => {
-  }
+  const handleEditPromptOnSave = () => {
+    const data = messageList.map(v => {
+      const {id, ...rest} = v;
+      return rest;
+    });
+    const paramsString = location.search.slice(1);
+    const {id} = qs.parse(paramsString);
+    if (!id) return;
+    setPromptContextById(id, data);
+  };
+
+  const promptMessageOnChange = (val: any, id: string | number) => {
+    setMessageList(prev => prev.map(v => v.id === id ? val : v));
+  };
 
   const contextSelectOnChange = (value: string) => {
     setContextData(location.state[value]);
@@ -192,7 +213,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
 
         <DraggableList
           dataSource={promptList()}
-          setDataSource={setContextList}
+          setDataSource={setMessageList}
         />
 
         <div className={classNames(['pr-16', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
@@ -205,7 +226,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
             type={'primary'}
             onClick={() => handleEditPromptEventAspect('add')}
           >Add</Button>
-          <Button type={'primary'} onClick={() => handleEditPromptEventAspect('add')}>Save</Button>
+          <Button type={'primary'} onClick={() => handleEditPromptEventAspect('save')}>Save</Button>
         </div>
 
       </div>
