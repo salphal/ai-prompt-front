@@ -10,6 +10,7 @@ import {useShallow} from "zustand/react/shallow";
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
 import useHomeStore, {setHomeFormData} from "@/pages/home/store.ts";
+import {v4 as uuidv4} from 'uuid';
 
 export interface HomeProps {
   [key: string]: any;
@@ -95,6 +96,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       search: handlePromptOnSearch,
       edit: handlePromptOnEdit,
       prompt: handlePromptOnPrompt,
+      copy: handlePromptOnCopy,
       remove: handlePromptOnRemove,
     };
     args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
@@ -116,7 +118,18 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     navigate(`/edit-prompt?id=${record.id}`, {state: record});
   };
 
-  const handlePromptOnRemove = (record: any) => {
+  const handlePromptOnCopy = () => {
+    if (!selectedRowKeys.length) return;
+    const selectedItems = dataSource
+      .filter((v: any) => selectedRowKeys.includes(v.id))
+      .map((v: any) => ({
+        ...v, id: uuidv4(),
+      }));
+    setPromptData((prev: any) => [...prev, ...selectedItems]);
+    setSelectedRowKeys([]);
+  };
+
+  const handlePromptOnRemove = () => {
     setPromptData((prev: any) => prev.filter((v: any) => !selectedRowKeys.includes(v.id)))
   };
 
