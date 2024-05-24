@@ -1,9 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import JsonEditor from "@/components/json-editor";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Flex} from "antd";
 import classNames from "classnames";
 import qs from "query-string";
+import {setPromptById} from "@/store/prompt.ts";
 
 export interface EditJsonProps {
   [key: string]: any;
@@ -14,7 +15,11 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [content, setContent] = useState<any>({});
+  const [json, setJson] = useState<any>({});
+
+  useEffect(() => {
+    setJson(location.state)
+  }, [location.state]);
 
   const handleBackOnClick = () => {
     navigate('/home');
@@ -23,10 +28,12 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
   const handleSaveOnClick = () => {
     const paramsString = location.search.slice(1);
     const {id} = qs.parse(paramsString);
+    setPromptById(id, json);
+    navigate('/home');
   };
 
   const jsonEditorOnChange = (changedContent: any, prevContent: any) => {
-    if (changedContent.json) setContent(changedContent.json);
+    setJson(changedContent.json);
   };
 
   return (
@@ -35,7 +42,7 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
       <div className={classNames(['h-full'])}>
         <JsonEditor
           content={{
-            json: location.state,
+            json: json,
             text: undefined
           }}
           onChange={jsonEditorOnChange}

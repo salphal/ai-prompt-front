@@ -1,6 +1,6 @@
 import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
 import classNames from "classnames";
-import {Button, Form, Input, Pagination, Select} from "antd";
+import {Button, Form, Input, Select, Table} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
 import {CopyOutlined, DeleteOutlined, FilterOutlined, MergeCellsOutlined, PlusOutlined} from "@ant-design/icons";
@@ -10,7 +10,6 @@ import {useShallow} from "zustand/react/shallow";
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
 import useHomeStore, {setHomeFormData} from "@/pages/home/store.ts";
-import EditableTable from "@/components/edit-table";
 
 export interface HomeProps {
   [key: string]: any;
@@ -29,7 +28,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const navigate = useNavigate();
 
   const {
-    promptData,
+    promptData: dataSource,
     columnKeysOptions
   } = usePromptStore(useShallow((state: any) => state));
 
@@ -61,7 +60,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       );
     }
   }
-  const {tableColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
+  const {tableColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
 
   const [paginationConfig, setPaginationConfig] = useState<any>({
     current: 1,
@@ -76,13 +75,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   useEffect(() => {
     form.setFieldsValue(homeFormData);
   }, [homeFormData])
-
-  // useEffect(() => {
-  //   if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
-  //   const data = fileContent.content.map((v: any) => ({...v, ...v.modelConfig, id: uuidv4()}));
-  //   setPromptData(data);
-  //   setPaginationConfig((p: any) => ({...p, total: data.length}));
-  // }, [fileContent]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -102,7 +94,8 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     const handles: any = {
       search: handlePromptOnSearch,
       edit: handlePromptOnEdit,
-      prompt: handlePromptOnPrompt
+      prompt: handlePromptOnPrompt,
+      remove: handlePromptOnRemove,
     };
     args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
@@ -123,28 +116,22 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     navigate(`/edit-prompt?id=${record.id}`, {state: record});
   };
 
+  const handlePromptOnRemove = (record: any) => {
+    setPromptData((prev: any) => prev.filter((v: any) => !selectedRowKeys.includes(v.id)))
+  };
+
   const formOnValueChange = (changedValues: any, allValues: any) => {
     setHomeFormData(allValues);
   };
+
+  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
+    dataSource.map((item: any) => item.id),
+  );
 
   return (
     <React.Fragment>
 
       <div className={'flex flex-col justify-between h-full'}>
-        {/*<div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>*/}
-        {/*  <Upload {...uploadProps}>*/}
-        {/*    <Button className={'mr-3'} icon={< DownloadOutlined/>}>Import</Button>*/}
-        {/*  </Upload>*/}
-        {/*  <Button*/}
-        {/*    className={'mr-3'}*/}
-        {/*    icon={<UploadOutlined/>}*/}
-        {/*    onClick={() => handlePromptEventAspect('export')}*/}
-        {/*  >Export</Button>*/}
-        {/*  <Button*/}
-        {/*    icon={<RedoOutlined/>}*/}
-        {/*    onClick={() => handlePromptEventAspect('reset')}*/}
-        {/*  >Reset</Button>*/}
-        {/*</div>*/}
         <div className={classNames(['flex', 'flex-row', 'justify-between', 'items-center'])}>
           <Form form={form} layout={'inline'} onValuesChange={formOnValueChange}>
             <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
@@ -176,7 +163,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             <Button
               className={'mr-3'}
               icon={<DeleteOutlined/>}
-              onClick={() => handlePromptEventAspect('merge')}
+              onClick={() => handlePromptEventAspect('remove')}
             >Remove</Button>
             <Button
               icon={<FilterOutlined/>}
@@ -185,27 +172,26 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
           </div>
         </div>
         <div id={'table-wrapper'} className={'flex-1'}>
-          <EditableTable
+          <Table
             rowKey={(record: any) => record.key || record.id}
-            dataSource={promptData}
+            dataSource={dataSource}
             columns={tableColumns}
-            setDataSource={setPromptData}
             pagination={false}
             scroll={tableScroll}
-            rowSelection={promptData.length ? tableRowSelection : null}
+            rowSelection={dataSource.length ? tableRowSelection : null}
           />
         </div>
-        <div className={'py-2'}>
-          <Pagination
-            className={'float-right'}
-            current={paginationConfig.current}
-            pageSize={paginationConfig.pageSize}
-            total={paginationConfig.total}
-            onChange={paginationOnChange}
-            showSizeChanger
-            showQuickJumper
-          />
-        </div>
+        {/*<div className={'py-2'}>*/}
+        {/*  <Pagination*/}
+        {/*    className={'float-right'}*/}
+        {/*    current={paginationConfig.current}*/}
+        {/*    pageSize={paginationConfig.pageSize}*/}
+        {/*    total={paginationConfig.total}*/}
+        {/*    onChange={paginationOnChange}*/}
+        {/*    showSizeChanger*/}
+        {/*    showQuickJumper*/}
+        {/*  />*/}
+        {/*</div>*/}
 
       </div>
 

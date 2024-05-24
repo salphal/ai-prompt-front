@@ -45,6 +45,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       title: 'operations',
       width: 200,
       fixed: 'right' as any,
+      valueType: 'option',
       ...operations
     };
 

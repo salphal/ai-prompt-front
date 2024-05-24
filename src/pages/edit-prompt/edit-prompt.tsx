@@ -155,6 +155,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
     const {id} = qs.parse(paramsString);
     if (!id) return;
     setPromptContextById(id, data);
+    navigate('/home');
   };
 
   const promptMessageOnChange = (val: any, id: string | number) => {

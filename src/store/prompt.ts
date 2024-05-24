@@ -58,11 +58,14 @@ export const setPromptProperty = (
 ) =>
   setStoreProperties(usePromptStore, key, value, merge, insertBefore, isDeconstruct);
 
-export const setPromptData = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
+export const setPromptData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('promptData', value, merge, insertBefore, isDeconstruct);
 
 export const setPromptContextById = (id: any, value: any) =>
   setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
+
+export const setPromptById = (id: any, value: any) =>
+  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
 
 export const setColumnKeys = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);

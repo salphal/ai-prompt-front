@@ -1,10 +1,7 @@
 import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
-import type {GetRef} from 'antd';
 import {Form, Input, Select, Table} from 'antd';
 
-type FormInstance<T> = GetRef<typeof Form<T>>;
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
+const EditableContext = React.createContext<any | null>(null);
 
 export interface EditableRowProps {
   index: number;
@@ -104,7 +101,7 @@ export type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 interface IEditableTable {
   columns: Array<any>;
   dataSource: Array<any>;
-  setDataSource: (value: any) => any;
+  onChange: (value: any) => any;
   /** 单行默认数据 */
   defaultRowData?: any;
 
@@ -116,7 +113,7 @@ const EditableTable: React.FC<React.PropsWithChildren<IEditableTable>> = (props)
   const {
     columns = [],
     dataSource = [],
-    setDataSource,
+    onChange,
     defaultRowData = {},
     ...restTableProps
   } = props;
@@ -137,8 +134,8 @@ const EditableTable: React.FC<React.PropsWithChildren<IEditableTable>> = (props)
       edit: handleEditableTableOnEdit,
     };
     args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
-    if (typeof setDataSource !== 'function') {
-      console.log(`请检查 setDataSource: ${setDataSource}`);
+    if (typeof onChange !== 'function') {
+      console.log(`请检查 onChange: ${onChange}`);
       return;
     }
     handles[type] && handles?.[type](...args);
@@ -149,24 +146,25 @@ const EditableTable: React.FC<React.PropsWithChildren<IEditableTable>> = (props)
       key: rowKey,
       ...defaultRowData
     };
-    setDataSource((prev: any) => [...prev, newRowData]);
+    onChange((prev: any) => [...prev, newRowData]);
     setRowKey(rowKey + 1);
   };
 
   const handleEditableTableOnDelete = (key: React.Key) => {
     const newData = dataSource.filter((item) => item.key !== key);
-    setDataSource(newData);
+    onChange(newData);
   };
 
   const handleEditableTableOnEdit = (row: any) => {
     const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
+    const index = newData.findIndex((item) => row.id === item.id);
+    if (index === -1) return;
     const item = newData[index];
     newData.splice(index, 1, {
       ...item,
       ...row,
     });
-    setDataSource(newData);
+    onChange(newData);
   };
 
   const editableTableColumns = useMemo(() => () => {

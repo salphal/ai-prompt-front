@@ -6,8 +6,9 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Upload} from "antd";
 import {DownloadOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
 import useUpload from "@/hooks/useUpload.ts";
-import {resetPromptData, setPromptData} from "@/store/prompt.ts";
+import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
 import {v4 as uuidv4} from "uuid";
+import {useShallow} from "zustand/react/shallow";
 
 export interface LayoutProps {
   [key: string]: any;
@@ -18,6 +19,10 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
   const navigate = useNavigate();
 
   const {pathname} = useLocation();
+
+  const {
+    promptData: dataSource,
+  } = usePromptStore(useShallow((state: any) => state));
 
   const {} = props;
 
@@ -51,7 +56,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           <Button
             className={'mr-3'}
             icon={<UploadOutlined/>}
-            onClick={() => onExportFile(fileContent)}
+            onClick={() => onExportFile({content: JSON.stringify(dataSource)})}
           >Export</Button>
           <Button
             icon={<RedoOutlined/>}
