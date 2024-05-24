@@ -1,6 +1,6 @@
 export const FILTER_KEYS = {
   key: "columnKey",
-  query: "value"
+  query: "query"
 }
 
 export const FILTER_LABELS = {

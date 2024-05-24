@@ -164,6 +164,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
+    console.log('=>(home.tsx:170) changedValues', changedValues);
     console.log('=>(home.tsx:172) allValues', allValues);
     setHomeFormData(allValues);
   };
