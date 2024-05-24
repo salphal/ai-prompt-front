@@ -175,10 +175,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
         <div className={classNames(['flex', 'flex-row', 'justify-between', 'items-center'])}>
           <Form form={form} layout={'inline'} onValuesChange={formOnValueChange}>
             <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
-              <Select style={{width: 120}} options={columnKeysOptions()}/>
+              <Select style={{width: 180}} options={columnKeysOptions()}/>
             </Form.Item>
             <Form.Item name={FILTER_KEYS.query} label={FILTER_LABELS[FILTER_KEYS.query]}>
-              <Input/>
+              <Input style={{width: 200}}/>
             </Form.Item>
           </Form>
           <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
