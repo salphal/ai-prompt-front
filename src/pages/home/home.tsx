@@ -64,7 +64,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     }
   }
   const {tableColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
-  console.log('=>(home.tsx:67) tableColumns', tableColumns);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
@@ -90,8 +89,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }, [homeFormData])
 
   useEffect(() => {
-    console.log('=>(home.tsx:94) homeFormData.query', homeFormData.query);
-    console.log('=>(home.tsx:94) homeFormData.key', homeFormData.key);
   }, [homeFormData.key, homeFormData.query]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
@@ -164,8 +161,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
-    console.log('=>(home.tsx:170) changedValues', changedValues);
-    console.log('=>(home.tsx:172) allValues', allValues);
     setHomeFormData(allValues);
   };
 
