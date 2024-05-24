@@ -49,8 +49,8 @@ export const setHomeData = (value: any, merge = true, insertBefore = false, isDe
 export const setHomeFormData = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
   setHomeProperty('homeFormData', value, merge, insertBefore, isDeconstruct);
 
-export const resetHomeData = () =>
-  setHomeProperty('homeData', initialHomeData.homeData, false);
+export const resetHomeFormData = () =>
+  setHomeProperty('homeFormData', initialHomeData.homeFormData, false);
 
 export const resetHomeStore = () =>
   useHomeStore.setState({...initialHomeData});

@@ -45,7 +45,6 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       title: 'operations',
       width: 200,
       fixed: 'right' as any,
-      valueType: 'option',
       ...operations
     };
 
@@ -71,7 +70,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
           dataIndex: key,
           title: key,
           width: 200,
-          editable: typeof val !== 'object',
+          valueType: typeof val !== 'object' ? 'text' : 'input'
         };
         return {
           ...config,

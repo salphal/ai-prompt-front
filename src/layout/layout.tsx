@@ -9,6 +9,7 @@ import useUpload from "@/hooks/useUpload.ts";
 import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
 import {v4 as uuidv4} from "uuid";
 import {useShallow} from "zustand/react/shallow";
+import {resetHomeFormData} from "@/pages/home/store.ts";
 
 export interface LayoutProps {
   [key: string]: any;
@@ -60,7 +61,10 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           >Export</Button>
           <Button
             icon={<RedoOutlined/>}
-            onClick={() => resetPromptData()}
+            onClick={() => {
+              resetPromptData();
+              resetHomeFormData();
+            }}
           >Reset</Button>
         </div>}
         actionsRender={() => []}

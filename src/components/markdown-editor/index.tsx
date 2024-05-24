@@ -1,4 +1,4 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle} from "react";
+import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize from "rehype-sanitize";
 
@@ -40,7 +40,8 @@ const MarkdownEditor: ForwardRefRenderFunction<MarkdownEditorRef, MarkdownEditor
     onChange
   } = props;
 
-  const [content, setContent] = React.useState("");
+  const [loading, setLoading] = useState<any>(false)
+  const [content, setContent] = useState("");
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -50,7 +51,9 @@ const MarkdownEditor: ForwardRefRenderFunction<MarkdownEditorRef, MarkdownEditor
   }, [value]);
 
   useEffect(() => {
+    setLoading(false);
     document.documentElement.setAttribute('data-color-mode', theme);
+    setLoading(true);
   }, [theme]);
 
   const MDEditorOnChange = (value: any) => {
@@ -62,7 +65,7 @@ const MarkdownEditor: ForwardRefRenderFunction<MarkdownEditorRef, MarkdownEditor
     <React.Fragment>
 
       <div style={{height: '100%'}}>
-        {editable ?
+        {(editable && loading) ?
           <MDEditor
             value={content}
             onChange={MDEditorOnChange}

@@ -1,16 +1,18 @@
 import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
 import classNames from "classnames";
-import {Button, Form, Input, Select, Table} from "antd";
+import {Button, Form, Input, message, Pagination, Select, Table} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
-import {CopyOutlined, DeleteOutlined, FilterOutlined, MergeCellsOutlined, PlusOutlined} from "@ant-design/icons";
+import {CopyOutlined, DeleteOutlined, FilterOutlined, FormOutlined, PlusOutlined} from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
-import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
+import usePromptStore, {setPromptData} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
 import useHomeStore, {setHomeFormData} from "@/pages/home/store.ts";
 import {v4 as uuidv4} from 'uuid';
+import EditableTable from "@/components/editalbe-table";
+import {resetObject} from "@/utils/format.ts";
 
 export interface HomeProps {
   [key: string]: any;
@@ -62,20 +64,35 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     }
   }
   const {tableColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
+  console.log('=>(home.tsx:67) tableColumns', tableColumns);
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>("");
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [defaultRowData, setDefaultRowData] = useState<any>({});
   const [paginationConfig, setPaginationConfig] = useState<any>({
     current: 1,
     pageSize: 100,
     total: 0
   });
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
   useEffect(() => {
+    if (!Array.isArray(dataSource) || !dataSource.length) return;
+    setDefaultRowData(resetObject(dataSource[0]));
+  }, [dataSource]);
+
+  useEffect(() => {
     form.setFieldsValue(homeFormData);
   }, [homeFormData])
+
+  useEffect(() => {
+    console.log('=>(home.tsx:94) homeFormData.query', homeFormData.query);
+    console.log('=>(home.tsx:94) homeFormData.key', homeFormData.key);
+  }, [homeFormData.key, homeFormData.query]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -92,10 +109,19 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const handlePromptEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
+    if (['copy', 'remove'].includes(type)) {
+      if (!selectedRowKeys.length) {
+        message.warning('Please select one or more rows.');
+        return;
+      }
+    }
+
     const handles: any = {
       search: handlePromptOnSearch,
       edit: handlePromptOnEdit,
+      editable: handlePromptOnEditable,
       prompt: handlePromptOnPrompt,
+      add: handlePromptOnAdd,
       copy: handlePromptOnCopy,
       remove: handlePromptOnRemove,
     };
@@ -106,16 +132,20 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const handlePromptOnSearch = () => {
   };
 
-  const handlePromptOnReset = () => {
-    resetPromptData();
-  };
-
   const handlePromptOnEdit = (record: any) => {
     navigate(`/edit-json?id=${record.id}`, {state: record});
   };
 
+  const handlePromptOnEditable = (record: any) => {
+    setIsEditable(prev => !prev);
+  };
+
   const handlePromptOnPrompt = (record: any) => {
     navigate(`/edit-prompt?id=${record.id}`, {state: record});
+  };
+
+  const handlePromptOnAdd = () => {
+    setPromptData((prev: any) => [...prev, {...defaultRowData, id: uuidv4()}]);
   };
 
   const handlePromptOnCopy = () => {
@@ -134,12 +164,9 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
+    console.log('=>(home.tsx:172) allValues', allValues);
     setHomeFormData(allValues);
   };
-
-  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
-    dataSource.map((item: any) => item.id),
-  );
 
   return (
     <React.Fragment>
@@ -150,34 +177,38 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
               <Select style={{width: 120}} options={columnKeysOptions()}/>
             </Form.Item>
-            <Form.Item name={FILTER_KEYS.value} label={FILTER_LABELS[FILTER_KEYS.value]}>
+            <Form.Item name={FILTER_KEYS.query} label={FILTER_LABELS[FILTER_KEYS.query]}>
               <Input/>
-            </Form.Item>
-            <Form.Item>
-              <Button type={'primary'} ghost>搜索</Button>
             </Form.Item>
           </Form>
           <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
+            {!isEditable && <>
+              <Button
+                className={'mr-3'}
+                icon={<PlusOutlined/>}
+                onClick={() => handlePromptEventAspect('add')}
+              >Add</Button>
+              <Button
+                className={'mr-3'}
+                icon={<CopyOutlined/>}
+                onClick={() => handlePromptEventAspect('copy')}
+              >Copy</Button>
+              <Button
+                className={'mr-3'}
+                icon={<DeleteOutlined/>}
+                onClick={() => handlePromptEventAspect('remove')}
+              >Remove</Button>
+              <Button
+                className={'mr-3'}
+                icon={<DeleteOutlined/>}
+                onClick={() => handlePromptEventAspect('merge')}
+              >Merge</Button>
+            </>}
             <Button
               className={'mr-3'}
-              icon={<PlusOutlined/>}
-              onClick={() => handlePromptEventAspect('copy')}
-            >Add</Button>
-            <Button
-              className={'mr-3'}
-              icon={<CopyOutlined/>}
-              onClick={() => handlePromptEventAspect('copy')}
-            >Copy</Button>
-            <Button
-              className={'mr-3'}
-              icon={<MergeCellsOutlined/>}
-              onClick={() => handlePromptEventAspect('merge')}
-            >Merge</Button>
-            <Button
-              className={'mr-3'}
-              icon={<DeleteOutlined/>}
-              onClick={() => handlePromptEventAspect('remove')}
-            >Remove</Button>
+              icon={<FormOutlined/>}
+              onClick={() => handlePromptEventAspect('editable')}
+            >{isEditable ? 'Editable' : 'UnEditable'}</Button>
             <Button
               icon={<FilterOutlined/>}
               onClick={() => handlePromptEventAspect('filter')}
@@ -185,26 +216,35 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
           </div>
         </div>
         <div id={'table-wrapper'} className={'flex-1'}>
-          <Table
-            rowKey={(record: any) => record.key || record.id}
-            dataSource={dataSource}
-            columns={tableColumns}
-            pagination={false}
-            scroll={tableScroll}
-            rowSelection={dataSource.length ? tableRowSelection : null}
+          {!isEditable ?
+            <Table
+              loading={loading}
+              rowKey={(record: any) => record.key || record.id}
+              dataSource={dataSource}
+              columns={tableColumns}
+              pagination={false}
+              scroll={tableScroll}
+              rowSelection={dataSource.length ? tableRowSelection : null}
+            /> :
+            <EditableTable
+              loading={loading}
+              dataSource={dataSource}
+              onChange={setPromptData}
+              columns={tableColumns}
+              scroll={tableScroll}
+            />}
+        </div>
+        <div className={'py-2'}>
+          <Pagination
+            className={'float-right'}
+            current={paginationConfig.current}
+            pageSize={paginationConfig.pageSize}
+            total={paginationConfig.total}
+            onChange={paginationOnChange}
+            showSizeChanger
+            showQuickJumper
           />
         </div>
-        {/*<div className={'py-2'}>*/}
-        {/*  <Pagination*/}
-        {/*    className={'float-right'}*/}
-        {/*    current={paginationConfig.current}*/}
-        {/*    pageSize={paginationConfig.pageSize}*/}
-        {/*    total={paginationConfig.total}*/}
-        {/*    onChange={paginationOnChange}*/}
-        {/*    showSizeChanger*/}
-        {/*    showQuickJumper*/}
-        {/*  />*/}
-        {/*</div>*/}
 
       </div>
 
