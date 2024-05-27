@@ -4,7 +4,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Flex} from "antd";
 import classNames from "classnames";
 import qs from "query-string";
-import {setPromptById} from "@/store/prompt.ts";
+import {setPromptDataById} from "@/store/prompt.ts";
 
 export interface EditJsonProps {
   [key: string]: any;
@@ -28,7 +28,7 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
   const handleSaveOnClick = () => {
     const paramsString = location.search.slice(1);
     const {id} = qs.parse(paramsString);
-    setPromptById(id, json);
+    setPromptDataById(id, json);
     navigate('/home');
   };
 

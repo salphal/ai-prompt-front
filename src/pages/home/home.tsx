@@ -1,17 +1,32 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useState} from "react";
+import React, {
+  ForwardRefRenderFunction,
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useState
+} from "react";
 import classNames from "classnames";
 import {Button, Form, Input, message, Pagination, Select, Table} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
 import {CopyOutlined, DeleteOutlined, FilterOutlined, FormOutlined, PlusOutlined} from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
-import usePromptStore, {setDefaultRowData, setFormData, setPromptData, setSelectedRowKeys} from "@/store/prompt.ts";
+import usePromptStore, {
+  setDefaultRowData,
+  setFilterColumnKey,
+  setFilterCondition,
+  setPromptData,
+  setSelectedRowKeys
+} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from 'uuid';
 import EditableTable from "@/components/editalbe-table";
 import {resetObject} from "@/utils/format.ts";
+import Countdown from "@/utils/count-down.ts";
 
 export interface HomeProps {
   [key: string]: any;
@@ -78,6 +93,17 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
+  useLayoutEffect(() => {
+    setLoading(true);
+    const countDown = new Countdown(
+      2,
+      (duration) => {
+        duration <= 0 && setLoading(false);
+      },
+    );
+    countDown.start();
+  }, []);
+
   useEffect(() => {
     if (!Array.isArray(promptData) || !promptData.length) return;
     setDefaultRowData(resetObject(promptData[0]));
@@ -103,6 +129,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const paginationOnChange = (current: number, pageSize: number) => {
     setPaginationConfig((prev: any) => ({...prev, current, pageSize}));
   };
+
+  const promptDataByQuery = useMemo(() => () => {
+
+  }, [promptData, formData]);
 
   const handlePromptEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
     if (['copy', 'remove'].includes(type)) {
@@ -171,7 +201,12 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
-    setFormData(allValues);
+    if (changedValues[FILTER_KEYS.key]) {
+      setFilterColumnKey(changedValues[FILTER_KEYS.key]);
+    }
+    if (changedValues[FILTER_KEYS.query]) {
+      setFilterCondition(changedValues[FILTER_KEYS.query]);
+    }
   };
 
   return (
@@ -230,7 +265,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               columns={tableColumns}
               pagination={false}
               scroll={tableScroll}
-              rowSelection={promptData.length ? tableRowSelection : null}
+              rowSelection={(promptData.length && !loading) ? tableRowSelection : null}
             /> :
             <EditableTable
               loading={loading}

@@ -16,11 +16,14 @@ export interface IPromptStore {
 
 export const initialPromptData = {
   promptData: [],
-  columnKeys: [],
-  contextData: [],
   selectedRowKeys: [],
+
+  columnKeys: [],
   defaultRowData: {},
-  formData: {},
+  contextData: [],
+
+  filterColumnKey: "",
+  filterCondition: ""
 }
 
 // useShallow(); 对象浅比较, 减少重绘
@@ -42,7 +45,6 @@ const usePromptStore = create(
       },
       promptColumns: () => {
       },
-      
     }),
     {
       name: 'promptStore', // unique name
@@ -67,11 +69,14 @@ export const setPromptProperty = (
 export const setPromptData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('promptData', value, merge, insertBefore, isDeconstruct);
 
+export const setPromptDataById = (id: any, value: any) =>
+  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
+
+export const setPromptDataByMerge = (value: any) =>
+  setPromptData((prev: any) => (prev.map((v: any) => ({...v, ...value}))));
+
 export const setPromptContextById = (id: any, value: any) =>
   setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
-
-export const setPromptById = (id: any, value: any) =>
-  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
 
 export const resetPromptData = () =>
   setPromptProperty('promptData', initialPromptData.promptData, false);
@@ -100,11 +105,11 @@ export const setDefaultRowData = (value: any, merge = false, insertBefore = fals
 export const resetDefaultRowData = () =>
   setPromptProperty('defaultRowData', initialPromptData.defaultRowData, false);
 
-export const setFormData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('formData', value, merge, insertBefore, isDeconstruct);
+export const setFilterColumnKey = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('filterColumnKey', value, merge, insertBefore, isDeconstruct);
 
-export const resetFormData = () =>
-  setPromptProperty('formData', initialPromptData.formData, false);
+export const setFilterCondition = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('filterCondition', value, merge, insertBefore, isDeconstruct);
 
 export const resetPromptStore = () =>
   usePromptStore.setState({...initialPromptData});

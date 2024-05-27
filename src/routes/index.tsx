@@ -12,23 +12,23 @@ const routes: RouteObject[] = [
     element: <Navigate to="/overview"/>
   },
   {
-    path: '/overview',
+    path: '/overview/*',
     element: <OverviewRoutes/>
   },
   {
-    path: '/home',
+    path: '/home/*',
     element: <HomeRoutes/>
   },
   {
-    path: '/edit-prompt',
+    path: '/edit-prompt/*',
     element: <EditPromptRoutes/>
   },
   {
-    path: '/edit-json',
+    path: '/edit-json/*',
     element: <EditJsonRoutes/>
   },
   {
-    path: '/merge-data',
+    path: '/merge-data/*',
     element: <MergeDataRoutes/>
   },
   {

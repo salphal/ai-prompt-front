@@ -22,7 +22,6 @@ export default class Countdown {
     this.timer = setInterval(() => {
       if (this.value > 0) {
         this.step ? (this.value -= this.step) : this.value--;
-
         this.callback(this.value);
       } else {
         this.stop();
