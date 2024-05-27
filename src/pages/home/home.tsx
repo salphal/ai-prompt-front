@@ -5,11 +5,10 @@ import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
 import {CopyOutlined, DeleteOutlined, FilterOutlined, FormOutlined, PlusOutlined} from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
-import usePromptStore, {setPromptData} from "@/store/prompt.ts";
+import usePromptStore, {setDefaultRowData, setFormData, setPromptData, setSelectedRowKeys} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {FILTER_KEYS, FILTER_LABELS} from "@/pages/home/constants/filter.tsx";
 import {useNavigate} from "react-router-dom";
-import useHomeStore, {setHomeFormData} from "@/pages/home/store.ts";
 import {v4 as uuidv4} from 'uuid';
 import EditableTable from "@/components/editalbe-table";
 import {resetObject} from "@/utils/format.ts";
@@ -31,13 +30,12 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const navigate = useNavigate();
 
   const {
-    promptData: dataSource,
-    columnKeysOptions
+    promptData,
+    columnKeysOptions,
+    selectedRowKeys,
+    defaultRowData,
+    formData
   } = usePromptStore(useShallow((state: any) => state));
-
-  const {
-    homeFormData
-  } = useHomeStore(useShallow((state: any) => state));
 
   const {height: tableHeight} = useClientRect({id: 'table-wrapper'});
   const tableScroll = {
@@ -59,17 +57,18 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             size={'small'}
             onClick={() => handlePromptEventAspect('prompt', record)}
           >Prompt</Button>
+          <Button
+            size={'small'}
+            onClick={() => handlePromptEventAspect('delete', record)}
+          >Delete</Button>
         </div>
       );
     }
   }
-  const {tableColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
+  const {tableColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [query, setQuery] = useState<string>("");
   const [isEditable, setIsEditable] = useState<boolean>(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [defaultRowData, setDefaultRowData] = useState<any>({});
   const [paginationConfig, setPaginationConfig] = useState<any>({
     current: 1,
     pageSize: 100,
@@ -80,16 +79,16 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   useImperativeHandle(ref, () => ({}));
 
   useEffect(() => {
-    if (!Array.isArray(dataSource) || !dataSource.length) return;
-    setDefaultRowData(resetObject(dataSource[0]));
-  }, [dataSource]);
+    if (!Array.isArray(promptData) || !promptData.length) return;
+    setDefaultRowData(resetObject(promptData[0]));
+  }, [promptData]);
 
   useEffect(() => {
-    form.setFieldsValue(homeFormData);
-  }, [homeFormData])
+    form.setFieldsValue(formData);
+  }, [formData])
 
   useEffect(() => {
-  }, [homeFormData.key, homeFormData.query]);
+  }, [formData.key, formData.query]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -119,8 +118,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       editable: handlePromptOnEditable,
       prompt: handlePromptOnPrompt,
       add: handlePromptOnAdd,
+      delete: handlePromptOnDelete,
       copy: handlePromptOnCopy,
       remove: handlePromptOnRemove,
+      merge: handlePromptOnMerge,
     };
     args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
@@ -145,9 +146,14 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     setPromptData((prev: any) => [...prev, {...defaultRowData, id: uuidv4()}]);
   };
 
+  const handlePromptOnDelete = (record: any) => {
+    if (!record.id) return;
+    setPromptData((prev: any) => prev.filter((v: any) => v.id !== record.id));
+  };
+
   const handlePromptOnCopy = () => {
     if (!selectedRowKeys.length) return;
-    const selectedItems = dataSource
+    const selectedItems = promptData
       .filter((v: any) => selectedRowKeys.includes(v.id))
       .map((v: any) => ({
         ...v, id: uuidv4(),
@@ -160,8 +166,12 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     setPromptData((prev: any) => prev.filter((v: any) => !selectedRowKeys.includes(v.id)))
   };
 
+  const handlePromptOnMerge = () => {
+    navigate(`/merge-data`);
+  };
+
   const formOnValueChange = (changedValues: any, allValues: any) => {
-    setHomeFormData(allValues);
+    setFormData(allValues);
   };
 
   return (
@@ -174,7 +184,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               <Select style={{width: 180}} options={columnKeysOptions()}/>
             </Form.Item>
             <Form.Item name={FILTER_KEYS.query} label={FILTER_LABELS[FILTER_KEYS.query]}>
-              <Input style={{width: 200}}/>
+              <Input style={{width: 200}} allowClear/>
             </Form.Item>
           </Form>
           <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
@@ -193,7 +203,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
                 className={'mr-3'}
                 icon={<DeleteOutlined/>}
                 onClick={() => handlePromptEventAspect('remove')}
-              >Remove</Button>
+              >Delete</Button>
               <Button
                 className={'mr-3'}
                 icon={<DeleteOutlined/>}
@@ -216,15 +226,15 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             <Table
               loading={loading}
               rowKey={(record: any) => record.key || record.id}
-              dataSource={dataSource}
+              dataSource={promptData}
               columns={tableColumns}
               pagination={false}
               scroll={tableScroll}
-              rowSelection={dataSource.length ? tableRowSelection : null}
+              rowSelection={promptData.length ? tableRowSelection : null}
             /> :
             <EditableTable
               loading={loading}
-              dataSource={dataSource}
+              dataSource={promptData}
               onChange={setPromptData}
               columns={tableColumns}
               scroll={tableScroll}

@@ -4,11 +4,11 @@ import {setStoreProperties} from "@/utils/zustand.ts";
 import {createSelectOptions} from "@/utils/antd/select.ts";
 
 export interface IPromptStore {
-  /** */
+  /** 提示词数据 */
   promptData: Array<any>;
-  /** */
+  /** 列索引集合 */
   columnKeys: Array<any>;
-  /** */
+  /** 提示词列表 */
   contextData: Array<any>;
 
   [key: string]: any
@@ -18,6 +18,9 @@ export const initialPromptData = {
   promptData: [],
   columnKeys: [],
   contextData: [],
+  selectedRowKeys: [],
+  defaultRowData: {},
+  formData: {},
 }
 
 // useShallow(); 对象浅比较, 减少重绘
@@ -36,7 +39,10 @@ const usePromptStore = create(
         const contextData = get().contextData;
         if (!Array.isArray(contextData) || !contextData.length) return [];
         return createSelectOptions(Object.keys(get().contextData[0]));
-      }
+      },
+      promptColumns: () => {
+      },
+      
     }),
     {
       name: 'promptStore', // unique name
@@ -67,14 +73,38 @@ export const setPromptContextById = (id: any, value: any) =>
 export const setPromptById = (id: any, value: any) =>
   setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
 
+export const resetPromptData = () =>
+  setPromptProperty('promptData', initialPromptData.promptData, false);
+
 export const setColumnKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);
+
+export const resetColumnKeys = () =>
+  setPromptProperty('columnKeys', initialPromptData.columnKeys, false);
 
 export const setContextData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('contextData', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
 
-export const resetPromptData = () =>
-  setPromptProperty('promptData', initialPromptData.promptData, false);
+export const resetContextData = () =>
+  setPromptProperty('contextData', initialPromptData.contextData, false);
+
+export const setSelectedRowKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('selectedRowKeys', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
+
+export const resetSelectedRowKeys = () =>
+  setPromptProperty('selectedRowKeys', initialPromptData.selectedRowKeys, false);
+
+export const setDefaultRowData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('defaultRowData', value, merge, insertBefore, isDeconstruct);
+
+export const resetDefaultRowData = () =>
+  setPromptProperty('defaultRowData', initialPromptData.defaultRowData, false);
+
+export const setFormData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('formData', value, merge, insertBefore, isDeconstruct);
+
+export const resetFormData = () =>
+  setPromptProperty('formData', initialPromptData.formData, false);
 
 export const resetPromptStore = () =>
   usePromptStore.setState({...initialPromptData});

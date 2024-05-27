@@ -43,7 +43,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     const operationsColumn = {
       key: 'table-operations-column',
       title: 'operations',
-      width: 200,
+      width: 240,
       fixed: 'right' as any,
       ...operations
     };

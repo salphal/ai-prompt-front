@@ -4,6 +4,7 @@ import Test from "@/pages/test.tsx";
 import HomeRoutes from "@/pages/home/route.tsx";
 import EditPromptRoutes from "@/pages/edit-prompt/route.tsx";
 import EditJsonRoutes from "@/pages/edit-json/route.tsx";
+import MergeDataRoutes from "@/pages/merge-data/route.tsx";
 
 const routes: RouteObject[] = [
   {
@@ -25,6 +26,10 @@ const routes: RouteObject[] = [
   {
     path: '/edit-json',
     element: <EditJsonRoutes/>
+  },
+  {
+    path: '/merge-data',
+    element: <MergeDataRoutes/>
   },
   {
     path: '/test',
