@@ -20,7 +20,12 @@ export interface IUseUploadProps {
  */
 const useUpload = (props: IUseUploadProps = {}) => {
 
-  const {defaultProps, onBefore, onChange} = props;
+  const {
+    maxCount = 1,
+    defaultProps,
+    onBefore,
+    onChange
+  } = props;
 
   const [fileList, setFileList] = useState<UploadFile[]>([
     // {
@@ -49,12 +54,16 @@ const useUpload = (props: IUseUploadProps = {}) => {
     reader.onload = () => {
       // 获取文件内容
       const result = reader.result;
-      setFileContent({
+      const content = typeof result === 'string' ? JSON.parse(result) : result;
+      const file = {
         name,
         size,
         type,
-        content: typeof result === 'string' ? JSON.parse(result) : result
-      });
+        content
+      }
+      setFileContent(file);
+      result ? message.success('文件解析成功!') : message.warning('解析文件内容为空!');
+      console.log("=>(useUpload.ts:63) fileContent", file);
     };
   };
 
@@ -123,7 +132,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
     name: 'file',
     action: '',
     accept: '.json',
-    maxCount: 1,
+    maxCount,
     showUploadList: false,
     multiple: false,
     fileList,
