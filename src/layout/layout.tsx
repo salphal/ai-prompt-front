@@ -30,6 +30,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
   const {uploadProps, fileContent, onExportFile} = useUpload({
     onBefore: () => false
   });
+  console.log('=>(layout.tsx:33) fileContent', fileContent);
 
   useEffect(() => {
     if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
@@ -68,6 +69,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
             onClick={() => onExportFile({content: JSON.stringify(dataSource)})}
           >Export</Button>
           <Button
+            className={classNames(['mr-10'])}
             icon={<RedoOutlined/>}
             onClick={() => {
               resetPromptStore();
@@ -75,11 +77,11 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           >Reset</Button>
         </div>}
         actionsRender={() => []}
-        avatarProps={{
-          src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
-          size: 'small',
-          title: 'admin',
-        }}
+        // avatarProps={{
+        //   src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
+        //   size: 'small',
+        //   title: 'admin',
+        // }}
         menuFooterRender={(props) => {
           if (props?.collapsed) return undefined;
           return (
