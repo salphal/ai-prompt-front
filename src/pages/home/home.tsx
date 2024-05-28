@@ -285,7 +285,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               placement="bottomLeft"
             >
               <Button
-                icon={columnKeys.length === columnFilterValue.length
+                icon={columnKeys.length - 1 === columnFilterValue.length || columnFilterValue.length === 0
                   ? <FilterOutlined/>
                   : <FilterFilled style={{color: '#000'}}/>}
                 onClick={() => handlePromptEventAspect('filter')}
