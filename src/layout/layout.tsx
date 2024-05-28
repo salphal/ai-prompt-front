@@ -30,13 +30,11 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
   const {uploadProps, fileContent, onExportFile} = useUpload({
     onBefore: () => false
   });
-  console.log('=>(layout.tsx:33) fileContent', fileContent);
 
   useEffect(() => {
     if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
 
     const data = fileContent.content.map((v: any) => ({...v, id: uuidv4()}));
-
     setDataSource(data);
 
     if (data.length) {
@@ -45,6 +43,30 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
       setColumnFilterValue(allColumnKeys);
     }
   }, [fileContent]);
+
+  const handlePromptEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
+
+    const handles: any = {
+      importJson: handlePromptOnImportJson,
+      exportFile: handlePromptOnExportFile,
+      reset: handlePromptOnReset,
+    };
+
+    args = (Object.keys(kwargs).length || typeof kwargs !== 'object') ? [kwargs, ...args] : args;
+    handles[type] && handles?.[type](...args);
+  };
+
+  const handlePromptOnImportJson = () => {
+  };
+
+  const handlePromptOnExportFile = () => {
+    onExportFile({content: JSON.stringify(dataSource)});
+  };
+
+  const handlePromptOnReset = () => {
+    resetPromptStore();
+  };
+
 
   return (
     <React.Fragment>
@@ -65,15 +87,18 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           </Upload>
           <Button
             className={'mr-3'}
+            icon={<DownloadOutlined/>}
+            onClick={() => handlePromptEventAspect('importJson')}
+          >Json</Button>
+          <Button
+            className={'mr-3'}
             icon={<UploadOutlined/>}
-            onClick={() => onExportFile({content: JSON.stringify(dataSource)})}
+            onClick={() => handlePromptEventAspect('exportFile')}
           >Export</Button>
           <Button
             className={classNames(['mr-10'])}
             icon={<RedoOutlined/>}
-            onClick={() => {
-              resetPromptStore();
-            }}
+            onClick={() => handlePromptEventAspect('reset')}
           >Reset</Button>
         </div>}
         actionsRender={() => []}
