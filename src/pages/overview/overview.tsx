@@ -2,9 +2,7 @@ import React, {useEffect} from "react";
 import Styles from "./index.module.scss";
 import classNames from "classnames";
 import {Button} from "antd";
-import {
-  EyeOutlined,
-} from '@ant-design/icons';
+import {EyeOutlined,} from '@ant-design/icons';
 import {Link} from "react-router-dom";
 import TextOverflowTip from "@/components/text-overflow-tip";
 
@@ -55,11 +53,11 @@ const Overview: React.FC<OverviewProps> = (props: OverviewProps) => {
         {/*<PromptMessage/>*/}
 
         <div className={Styles.info}>
-          <div className={Styles.title}>挑选一个提示词</div>
-          <div className={Styles.subTitle}>现在开始, 与提示词的灵魂碰撞</div>
+          <div className={Styles.title}>Pick a prompt word</div>
+          <div className={Styles.subTitle}>Start now, collision with the soul of the prompt word</div>
         </div>
         <div className={Styles.controller}>
-          <Button className={'mr-3'} icon={<EyeOutlined/>}><Link to={'/home'}>查看全部</Link></Button>
+          <Button className={'mr-3'} icon={<EyeOutlined/>}><Link to={'/home'}>See all</Link></Button>
           <TextOverflowTip width={100} popRender={(p: any) => p.children}></TextOverflowTip>
         </div>
         <div className={Styles.content}>
