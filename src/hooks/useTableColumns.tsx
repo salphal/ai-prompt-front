@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import TextOverflowTip from "@/components/text-overflow-tip";
 import JsonViewer from "@/components/json-viewer";
 import {setColumnKeys} from "@/store/prompt.ts";
+import {HolderOutlined} from "@ant-design/icons";
 
 export interface IUseTableColumnsProps {
   columns?: Array<any>;
@@ -40,6 +41,8 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
     let tableColumns = [];
 
+    const sortColumn = {key: 'sort', align: 'center', width: 80, render: () => <HolderOutlined/>}
+
     const indexColumn = {
       key: 'index',
       title: "No",
@@ -64,7 +67,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     const blackList = ['id'];
     tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
 
-    return tableColumns.length ? [indexColumn, ...tableColumns, operationsColumn] : [];
+    return tableColumns.length ? [sortColumn, indexColumn, ...tableColumns, operationsColumn] : [];
 
   }, [columns, tableData, filterColumns]);
 
@@ -87,11 +90,12 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
   };
 
   const renderColumn = (config: any, text: any, record: any, index: number) => {
-    if ((typeof text === 'object' && text !== null)) {
+    if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(text))) {
       return renderJsonView(text, config);
     } else {
       return renderTextColumn(text, config);
     }
+    return String(text);
   }
 
   const renderJsonView = (text: any, config: any) =>
