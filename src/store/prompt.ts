@@ -5,7 +5,7 @@ import {createSelectOptions} from "@/utils/antd/select.ts";
 
 export interface IPromptStore {
   /** 提示词数据 */
-  promptData: Array<any>;
+  dataSource: Array<any>;
   /** 列索引集合 */
   columnKeys: Array<any>;
   /** 提示词列表 */
@@ -15,15 +15,15 @@ export interface IPromptStore {
 }
 
 export const initialPromptData = {
-  promptData: [],
+  dataSource: [],
   selectedRowKeys: [],
+  columnFilterValue: [],
 
   columnKeys: [],
   defaultRowData: {},
   contextData: [],
 
-  filterColumnKey: "",
-  filterCondition: ""
+  formData: {}
 }
 
 // useShallow(); 对象浅比较, 减少重绘
@@ -66,20 +66,23 @@ export const setPromptProperty = (
 ) =>
   setStoreProperties(usePromptStore, key, value, merge, insertBefore, isDeconstruct);
 
-export const setPromptData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('promptData', value, merge, insertBefore, isDeconstruct);
+export const setDataSource = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('dataSource', value, merge, insertBefore, isDeconstruct);
 
-export const setPromptDataById = (id: any, value: any) =>
-  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
+export const setDataSourceById = (id: any, value: any) =>
+  setDataSource((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
 
-export const setPromptDataByMerge = (value: any) =>
-  setPromptData((prev: any) => (prev.map((v: any) => ({...v, ...value}))));
+export const setDataSourceByMerge = (value: any) =>
+  setDataSource((prev: any) => (prev.map((v: any) => ({...v, ...value}))));
 
 export const setPromptContextById = (id: any, value: any) =>
-  setPromptData((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
+  setDataSource((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
 
-export const resetPromptData = () =>
-  setPromptProperty('promptData', initialPromptData.promptData, false);
+export const resetDataSource = () =>
+  setPromptProperty('dataSource', initialPromptData.dataSource, false);
+
+export const setColumnFilterValue = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('columnFilterValue', value, merge, insertBefore, isDeconstruct);
 
 export const setColumnKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);
@@ -105,11 +108,8 @@ export const setDefaultRowData = (value: any, merge = false, insertBefore = fals
 export const resetDefaultRowData = () =>
   setPromptProperty('defaultRowData', initialPromptData.defaultRowData, false);
 
-export const setFilterColumnKey = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('filterColumnKey', value, merge, insertBefore, isDeconstruct);
-
-export const setFilterCondition = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('filterCondition', value, merge, insertBefore, isDeconstruct);
+export const setFormData = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('formData', value, merge, insertBefore, isDeconstruct);
 
 export const resetPromptStore = () =>
   usePromptStore.setState({...initialPromptData});

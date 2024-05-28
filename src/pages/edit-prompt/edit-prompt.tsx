@@ -227,7 +227,7 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
             type={'primary'}
             onClick={() => handleEditPromptEventAspect('add')}
           >Add</Button>
-          <Button type={'primary'} onClick={() => handleEditPromptEventAspect('save')}>Save</Button>
+          <Button type={'primary'} onClick={() => handleEditPromptEventAspect('save')}>Merge</Button>
         </div>
 
       </div>

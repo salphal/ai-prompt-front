@@ -4,7 +4,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Flex} from "antd";
 import classNames from "classnames";
 import qs from "query-string";
-import {setPromptDataById} from "@/store/prompt.ts";
+import {setDataSourceById} from "@/store/prompt.ts";
 
 export interface EditJsonProps {
   [key: string]: any;
@@ -28,7 +28,7 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
   const handleSaveOnClick = () => {
     const paramsString = location.search.slice(1);
     const {id} = qs.parse(paramsString);
-    setPromptDataById(id, json);
+    setDataSourceById(id, json);
     navigate('/home');
   };
 
@@ -50,7 +50,7 @@ const EditJson: React.FC<EditJsonProps> = (props: EditJsonProps) => {
         />
         <Flex className={classNames(['h-20'])} justify={'center'} align={'center'}>
           <Button className={'mr-3'} onClick={handleBackOnClick}>Back</Button>
-          <Button type={'primary'} onClick={handleSaveOnClick}>Save</Button>
+          <Button type={'primary'} onClick={handleSaveOnClick}>Merge</Button>
         </Flex>
       </div>
 

@@ -8,16 +8,24 @@ import React, {
   useState
 } from "react";
 import classNames from "classnames";
-import {Button, Form, Input, message, Pagination, Select, Table} from "antd";
+import {Button, Checkbox, Form, Input, message, Pagination, Popover, Select, Table} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
-import {CopyOutlined, DeleteOutlined, FilterOutlined, FormOutlined, PlusOutlined} from "@ant-design/icons";
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  FilterFilled,
+  FilterOutlined,
+  FormOutlined,
+  MergeCellsOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
 import usePromptStore, {
+  setColumnFilterValue,
+  setDataSource,
   setDefaultRowData,
-  setFilterColumnKey,
-  setFilterCondition,
-  setPromptData,
+  setFormData,
   setSelectedRowKeys
 } from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
@@ -27,6 +35,7 @@ import {v4 as uuidv4} from 'uuid';
 import EditableTable from "@/components/editalbe-table";
 import {resetObject} from "@/utils/format.ts";
 import Countdown from "@/utils/count-down.ts";
+import "./index.scss";
 
 export interface HomeProps {
   [key: string]: any;
@@ -45,11 +54,13 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const navigate = useNavigate();
 
   const {
-    promptData,
+    dataSource,
     columnKeysOptions,
+    columnFilterValue,
+    columnKeys,
     selectedRowKeys,
     defaultRowData,
-    formData
+    formData,
   } = usePromptStore(useShallow((state: any) => state));
 
   const {height: tableHeight} = useClientRect({id: 'table-wrapper'});
@@ -80,7 +91,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       );
     }
   }
-  const {tableColumns} = useTableColumns({tableData: promptData, operations: tableOperationsColumn})
+  const {tableColumns, setFilterColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditable, setIsEditable] = useState<boolean>(false);
@@ -105,16 +116,25 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }, []);
 
   useEffect(() => {
-    if (!Array.isArray(promptData) || !promptData.length) return;
-    setDefaultRowData(resetObject(promptData[0]));
-  }, [promptData]);
+    if (!Array.isArray(dataSource) || !dataSource.length) return;
+    setDefaultRowData(resetObject(dataSource[0]));
+  }, [dataSource]);
 
   useEffect(() => {
     form.setFieldsValue(formData);
-  }, [formData])
+  }, [formData]);
 
   useEffect(() => {
-  }, [formData.key, formData.query]);
+    setFilterColumns((prev: any[]) => [...columnFilterValue]);
+  }, [columnFilterValue])
+
+  const dataSourceByFilter = useMemo(() => () => {
+    const queryKey = formData[FILTER_KEYS.key];
+    const queryString = formData[FILTER_KEYS.query];
+    if (!queryKey || !queryString) return dataSource;
+    return dataSource.filter((rowData: any) =>
+      typeof rowData[queryKey] === 'string' && rowData[queryKey].toLowerCase().indexOf(queryString) !== -1);
+  }, [formData, dataSource]);
 
   const rowSelectionOnChange = (selectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -129,10 +149,6 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const paginationOnChange = (current: number, pageSize: number) => {
     setPaginationConfig((prev: any) => ({...prev, current, pageSize}));
   };
-
-  const promptDataByQuery = useMemo(() => () => {
-
-  }, [promptData, formData]);
 
   const handlePromptEventAspect = (type: string, kwargs: object = {}, ...args: any[]) => {
     if (['copy', 'remove'].includes(type)) {
@@ -173,27 +189,27 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const handlePromptOnAdd = () => {
-    setPromptData((prev: any) => [...prev, {...defaultRowData, id: uuidv4()}]);
+    setDataSource((prev: any) => [...prev, {...defaultRowData, id: uuidv4()}]);
   };
 
   const handlePromptOnDelete = (record: any) => {
     if (!record.id) return;
-    setPromptData((prev: any) => prev.filter((v: any) => v.id !== record.id));
+    setDataSource((prev: any) => prev.filter((v: any) => v.id !== record.id));
   };
 
   const handlePromptOnCopy = () => {
     if (!selectedRowKeys.length) return;
-    const selectedItems = promptData
+    const selectedItems = dataSource
       .filter((v: any) => selectedRowKeys.includes(v.id))
       .map((v: any) => ({
         ...v, id: uuidv4(),
       }));
-    setPromptData((prev: any) => [...prev, ...selectedItems]);
+    setDataSource((prev: any) => [...prev, ...selectedItems]);
     setSelectedRowKeys([]);
   };
 
   const handlePromptOnRemove = () => {
-    setPromptData((prev: any) => prev.filter((v: any) => !selectedRowKeys.includes(v.id)))
+    setDataSource((prev: any) => prev.filter((v: any) => !selectedRowKeys.includes(v.id)))
   };
 
   const handlePromptOnMerge = () => {
@@ -201,13 +217,16 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
-    if (changedValues[FILTER_KEYS.key]) {
-      setFilterColumnKey(changedValues[FILTER_KEYS.key]);
-    }
-    if (changedValues[FILTER_KEYS.query]) {
-      setFilterCondition(changedValues[FILTER_KEYS.query]);
-    }
+    setFormData({...allValues});
   };
+
+  const tableFilterOnChange = (value: Array<any>) => {
+    setColumnFilterValue(value);
+  };
+
+  const selectedAllOnChange = () => {
+    setColumnFilterValue((prev: any[]) => prev.length === columnKeys.length ? [] : columnKeys);
+  }
 
   return (
     <React.Fragment>
@@ -241,7 +260,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               >Delete</Button>
               <Button
                 className={'mr-3'}
-                icon={<DeleteOutlined/>}
+                icon={<MergeCellsOutlined/>}
                 onClick={() => handlePromptEventAspect('merge')}
               >Merge</Button>
             </>}
@@ -250,10 +269,28 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               icon={<FormOutlined/>}
               onClick={() => handlePromptEventAspect('editable')}
             >{isEditable ? 'Editable' : 'UnEditable'}</Button>
-            <Button
-              icon={<FilterOutlined/>}
-              onClick={() => handlePromptEventAspect('filter')}
-            ></Button>
+            <Popover
+              content={<div className={classNames(['pb-6'])}>
+                <div className={classNames(['flex', 'justify-end', 'm-3'])}>
+                  <Button size={'small'} onClick={selectedAllOnChange}>Select all</Button>
+                </div>
+                <Checkbox.Group
+                  className={classNames(['table-filter', 'flex', 'flex-col'])}
+                  options={columnKeysOptions()}
+                  value={columnFilterValue}
+                  onChange={tableFilterOnChange}
+                />
+              </div>}
+              trigger="click"
+              placement="bottomLeft"
+            >
+              <Button
+                icon={columnKeys.length === columnFilterValue.length
+                  ? <FilterOutlined/>
+                  : <FilterFilled style={{color: '#000'}}/>}
+                onClick={() => handlePromptEventAspect('filter')}
+              ></Button>
+            </Popover>
           </div>
         </div>
         <div id={'table-wrapper'} className={'flex-1'}>
@@ -261,16 +298,16 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
             <Table
               loading={loading}
               rowKey={(record: any) => record.key || record.id}
-              dataSource={promptData}
+              dataSource={dataSourceByFilter()}
               columns={tableColumns}
               pagination={false}
               scroll={tableScroll}
-              rowSelection={(promptData.length && !loading) ? tableRowSelection : null}
+              rowSelection={(dataSource.length && !loading) ? tableRowSelection : null}
             /> :
             <EditableTable
               loading={loading}
-              dataSource={promptData}
-              onChange={setPromptData}
+              dataSource={dataSource}
+              onChange={setDataSource}
               columns={tableColumns}
               scroll={tableScroll}
             />}

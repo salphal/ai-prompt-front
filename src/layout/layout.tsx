@@ -6,7 +6,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Upload} from "antd";
 import {DownloadOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
 import useUpload from "@/hooks/useUpload.ts";
-import usePromptStore, {resetPromptData, setPromptData} from "@/store/prompt.ts";
+import usePromptStore, {resetPromptStore, setDataSource} from "@/store/prompt.ts";
 import {v4 as uuidv4} from "uuid";
 import {useShallow} from "zustand/react/shallow";
 
@@ -21,7 +21,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
   const {pathname} = useLocation();
 
   const {
-    promptData: dataSource,
+    dataSource,
   } = usePromptStore(useShallow((state: any) => state));
 
   const {} = props;
@@ -32,8 +32,8 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
 
   useEffect(() => {
     if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
-    const data = fileContent.content.map((v: any) => ({...v, ...v.modelConfig, id: uuidv4()}));
-    setPromptData(data);
+    const data = fileContent.content.map((v: any) => ({...v, id: uuidv4()}));
+    setDataSource(data);
   }, [fileContent]);
 
   return (
@@ -61,7 +61,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           <Button
             icon={<RedoOutlined/>}
             onClick={() => {
-              resetPromptData();
+              resetPromptStore();
             }}
           >Reset</Button>
         </div>}

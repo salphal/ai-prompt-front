@@ -40,6 +40,13 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
     let tableColumns = [];
 
+    const indexColumn = {
+      key: 'index',
+      title: "No",
+      width: 80,
+      render: (_: any, __: any, i: number) => i,
+    };
+
     const operationsColumn = {
       key: 'table-operations-column',
       title: 'operations',
@@ -57,7 +64,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     const blackList = ['id'];
     tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
 
-    return tableColumns.length ? [...tableColumns, operationsColumn] : [];
+    return tableColumns.length ? [indexColumn, ...tableColumns, operationsColumn] : [];
 
   }, [columns, tableData, filterColumns]);
 
