@@ -8,7 +8,7 @@ import React, {
   useState
 } from "react";
 import classNames from "classnames";
-import {Button, Checkbox, Form, Input, message, Pagination, Popover, Select, Table} from "antd";
+import {Button, Checkbox, Form, Input, message, Pagination, Popover, Select} from "antd";
 import {useForm} from "antd/es/form/Form";
 import useClientRect from "@/hooks/useClientRect.ts";
 import {
@@ -36,6 +36,7 @@ import EditableTable from "@/components/editalbe-table";
 import {resetObject} from "@/utils/format.ts";
 import Countdown from "@/utils/count-down.ts";
 import "./index.scss";
+import SortableTable from "@/components/sortable-table";
 
 export interface HomeProps {
   [key: string]: any;
@@ -299,7 +300,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
         </div>
         <div id={'table-wrapper'} className={'flex-1'}>
           {!isEditable ?
-            <Table
+            <SortableTable
               loading={loading}
               rowKey={(record: any) => record.key || record.id}
               dataSource={dataSourceByFilter()}
