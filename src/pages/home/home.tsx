@@ -70,7 +70,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const tableOperationsColumn = {
-    render: (_: any, record: any) => {
+    render: (v: any, record: any) => {
       return (
         <div>
           <Button
@@ -171,6 +171,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     };
     args = Object.keys(kwargs).length ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
+
+    if (['add', 'delete', 'remove', 'copy',].includes(type)) {
+      setSelectedRowKeys([]);
+    }
   };
 
   const handlePromptOnSearch = () => {
@@ -202,10 +206,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     const selectedItems = dataSource
       .filter((v: any) => selectedRowKeys.includes(v.id))
       .map((v: any) => ({
-        ...v, id: uuidv4(),
+        ...v,
+        id: uuidv4(),
       }));
     setDataSource((prev: any) => [...prev, ...selectedItems]);
-    setSelectedRowKeys([]);
   };
 
   const handlePromptOnRemove = () => {
@@ -302,7 +306,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               columns={tableColumns}
               pagination={false}
               scroll={tableScroll}
-              rowSelection={(dataSource.length && !loading) ? tableRowSelection : null}
+              rowSelection={(Array.isArray(dataSource) && dataSource.length && !loading) ? tableRowSelection : null}
             /> :
             <EditableTable
               loading={loading}
