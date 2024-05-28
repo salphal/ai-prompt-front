@@ -5,18 +5,14 @@ export interface ZustandStore {
 }
 
 /** 若存入的不是 object 类型, 而是自定义类, 则展开运算可能会导致私有成员丢失 */
-const isZustandObject = (target: any) => Object.prototype.toString.call(target) === '[object Object]'
+const isZustandObject = (target: any) => Object.prototype.toString.call(target) === '[object Object]';
 
-const isZustandFunc = (target: any) => typeof target === 'function'
+const isZustandFunc = (target: any) => typeof target === 'function';
 
-const isZustandArray = (target: any) => Array.isArray(target)
-
-const isZustandStore = (store: any) => {
-  return typeof store.name === 'string' && store.name === 'useBoundStore';
-}
+const isZustandArray = (target: any) => Array.isArray(target);
 
 /**
- * @param store {ZustandStore | null} - ZustandStore 实例
+ * @param store {ZustandStore} - ZustandStore 实例
  * @param key {string} - 数据名
  * @param value {any} - 数据值
  * @param merge {boolean} - 是否和之前的该值合并
@@ -26,21 +22,20 @@ const isZustandStore = (store: any) => {
  *    - 注意: 会失去解构对象上的私有成员
  */
 export const setStoreProperties = (
-  store: ZustandStore | null = null,
+  store: ZustandStore,
   key: string,
   value: any,
   merge = true,
   insertBefore = false,
   isDeconstruct = false
 ) => {
-  if (!store || !isZustandStore(store)) return
   /** 解决解构丢失私有成员 */
   if (isDeconstruct) {
     store.setState((prev: any) => ({
       ...prev,
       [key]: value
     }));
-    return
+    return;
   }
   if (isZustandObject(value)) {
     store.setState((prev: any) => ({

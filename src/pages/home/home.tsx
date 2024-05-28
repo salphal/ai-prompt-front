@@ -63,6 +63,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     defaultRowData,
     formData,
   } = usePromptStore(useShallow((state: any) => state));
+  console.log("=>(home.tsx:66) dataSource", dataSource);
 
   const {height: tableHeight} = useClientRect({id: 'table-wrapper'});
   const tableScroll = {

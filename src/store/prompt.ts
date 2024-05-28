@@ -12,7 +12,7 @@ export interface IPromptStore {
   /** 提示词列表 */
   contextData: Array<any>;
 
-  [key: string]: any
+  [key: string]: any;
 }
 
 export const initialPromptData = {
