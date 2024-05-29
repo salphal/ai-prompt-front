@@ -204,11 +204,11 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
                 <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
               </Form.Item>
             </Col>
-            <Col span={4}>
-              <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>
-                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-              </Form.Item>
-            </Col>
+            {/*<Col span={4}>*/}
+            {/*  <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>*/}
+            {/*    <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>*/}
+            {/*  </Form.Item>*/}
+            {/*</Col>*/}
           </Row>
         </Form>
 
