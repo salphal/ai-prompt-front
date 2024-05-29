@@ -1,18 +1,25 @@
 import React, {useEffect, useMemo, useState} from "react";
 import PromptMessage from "@/components/prompt-message";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Col, Form, Row, Select} from "antd";
+import {Button, Col, Flex, Form, Popover, Row, Select, Typography} from "antd";
 import usePromptStore, {setContextData, setPromptContextById} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {PROMPT_FORM_KEYS, PROMPT_FORM_LABELS} from "@/pages/edit-prompt/constants/form.ts";
 import {selectFilterOption} from "@/utils/antd/select.ts";
 import useEditPromptStore, {setPromptFormData} from "@/pages/edit-prompt/store.ts";
 import DraggableList from "@/components/draggable-list";
-import {CloseOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined} from '@ant-design/icons';
+import {
+  CloseOutlined,
+  QuestionCircleOutlined,
+  VerticalAlignBottomOutlined,
+  VerticalAlignTopOutlined
+} from '@ant-design/icons';
 import classNames from "classnames";
 import {v4 as uuidv4} from 'uuid';
 import useScroll from "@/hooks/useScroll.ts";
 import qs from "query-string";
+
+const {Title, Paragraph, Text, Link} = Typography;
 
 export interface EditPromptProps {
   [key: string]: any;
@@ -182,34 +189,74 @@ const EditPrompt: React.FC<EditPromptProps> = (props: EditPromptProps) => {
           labelAlign={'left'}
           onValuesChange={formOnValueChange}
         >
-          <Row className={classNames(['pl-5'])} gutter={24} justify="start">
-            <Col span={5}>
-              <Form.Item name={PROMPT_FORM_KEYS.contextKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contextKey]}>
-                <Select
-                  onChange={contextSelectOnChange}
-                  options={columnKeysOptions()}
-                  filterOption={selectFilterOption}
-                  showSearch
-                  allowClear
-                />
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item name={PROMPT_FORM_KEYS.roleKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.roleKey]}>
-                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item name={PROMPT_FORM_KEYS.contentKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contentKey]}>
-                <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
-              </Form.Item>
-            </Col>
-            {/*<Col span={4}>*/}
-            {/*  <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>*/}
-            {/*    <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>*/}
-            {/*  </Form.Item>*/}
-            {/*</Col>*/}
-          </Row>
+          <Flex className={classNames(['mb-10'])} justify={'space-between'}>
+            <Row className={classNames(['pl-5', 'flex-1'])} gutter={24} justify="start">
+              <Col span={5}>
+                <Form.Item
+                  className={'!m-0'}
+                  name={PROMPT_FORM_KEYS.contextKey}
+                  label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contextKey]}
+                >
+                  <Select
+                    onChange={contextSelectOnChange}
+                    options={columnKeysOptions()}
+                    filterOption={selectFilterOption}
+                    showSearch
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={4}>
+                <Form.Item
+                  className={'!m-0'}
+                  name={PROMPT_FORM_KEYS.roleKey}
+                  label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.roleKey]}
+                >
+                  <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
+                </Form.Item>
+              </Col>
+              <Col span={4}>
+                <Form.Item
+                  className={'!m-0'}
+                  name={PROMPT_FORM_KEYS.contentKey}
+                  label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.contentKey]}
+                >
+                  <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>
+                </Form.Item>
+              </Col>
+              {/*<Col span={4}>*/}
+              {/*  <Form.Item name={PROMPT_FORM_KEYS.dataKey} label={PROMPT_FORM_LABELS[PROMPT_FORM_KEYS.dataKey]}>*/}
+              {/*    <Select options={contextKeysOptions()} filterOption={selectFilterOption} showSearch allowClear/>*/}
+              {/*  </Form.Item>*/}
+              {/*</Col>*/}
+            </Row>
+            <Popover
+              placement="leftBottom"
+              title={<div></div>}
+              content={
+                <Typography>
+                  <Title level={5}>Role</Title>
+                  <Paragraph>
+                    <ul>
+                      <li>system?: 定义角色的使用场景</li>
+                      <li>user: 模拟用户发送的问题</li>
+                      <li>assistant: 模拟期望返回的结果</li>
+                    </ul>
+                  </Paragraph>
+                  <Title level={5}>Content</Title>
+                  <Paragraph>
+                    模拟的具体内容
+                  </Paragraph>
+                </Typography>
+              }
+            >
+              <QuestionCircleOutlined/>
+            </Popover>
+            {/*<div className={classNames(['mr-5'])}>*/}
+
+
+            {/*</div>*/}
+          </Flex>
         </Form>
 
         <DraggableList

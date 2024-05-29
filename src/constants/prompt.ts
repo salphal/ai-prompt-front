@@ -3,7 +3,7 @@ import {ERole} from "@/typings/prompt.ts";
 export enum PROMPT_CONTEXT_KEYS {
   role = 'role',
   content = 'content',
-  data = 'data',
+  date = 'date',
 }
 
 export const PROMPT_ROLES = [ERole.user, ERole.system, ERole.assistant];
@@ -11,7 +11,7 @@ export const PROMPT_ROLES = [ERole.user, ERole.system, ERole.assistant];
 export const PROMPT_CONTEXT_LABELS = {
   [PROMPT_CONTEXT_KEYS.role]: '角色',
   [PROMPT_CONTEXT_KEYS.content]: '内容',
-  [PROMPT_CONTEXT_KEYS.data]: '辅助信息',
+  [PROMPT_CONTEXT_KEYS.date]: '日期',
 }
 
 export enum PROMPT_MODEL_KEYS {
