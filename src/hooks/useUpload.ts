@@ -3,12 +3,21 @@ import {message, UploadFile, UploadProps} from "antd";
 import {saveAs} from "file-saver";
 import {useState} from "react";
 
+export interface IFile {
+  name: string,
+  size: number,
+  type: string,
+  content: any
+}
+
 export interface IUseUploadProps {
   [key: string]: any;
 
+  maxCount?: number;
   defaultProps?: UploadProps;
   onBefore?: (file: RcFile, FileList: RcFile[]) => boolean;
   onChange?: (status: UploadFileStatus | undefined, info: any) => void;
+  onParseJson?: (file: IFile) => void;
 }
 
 /**
@@ -24,7 +33,8 @@ const useUpload = (props: IUseUploadProps = {}) => {
     maxCount = 1,
     defaultProps,
     onBefore,
-    onChange
+    onChange,
+    onParseJson
   } = props;
 
   const [fileList, setFileList] = useState<UploadFile[]>([
@@ -47,23 +57,33 @@ const useUpload = (props: IUseUploadProps = {}) => {
    * @param file {RcFile} 上传的文件
    */
   const onImportJson = (file: RcFile) => {
+
     const {name, size, type} = file;
+
     // 创建 FileReader 对象读取文件
     const reader = new FileReader();
     reader.readAsText(file);
+
     reader.onload = () => {
       // 获取文件内容
       const result = reader.result;
       const content = typeof result === 'string' ? JSON.parse(result) : result;
+
       const file = {
         name,
         size,
         type,
         content
-      }
+      };
+
       setFileContent(file);
-      result ? message.success('文件解析成功!') : message.warning('解析文件内容为空!');
-      console.log("=>(useUpload.ts:63) fileContent", file);
+
+      if (result) {
+        typeof onParseJson === 'function' && onParseJson(file);
+        message.success('文件解析成功!')
+      } else {
+        message.warning('解析文件内容为空!');
+      }
     };
   };
 
@@ -73,13 +93,17 @@ const useUpload = (props: IUseUploadProps = {}) => {
    * @param ext {string} 文件名后缀
    */
   const onExportFile = (file: any, ext: string = 'json') => {
+
     const {name = 'prompts', type = 'application/json', size, content} = file;
+
     if (size === 0) {
       message.error("文件内容为空");
       return;
     }
+
     const blob = new Blob([content], {type});
     const filename = name.indexOf('.') === -1 ? `${name}.${ext}` : name;
+
     saveAs(blob, filename);
   }
 
@@ -91,31 +115,38 @@ const useUpload = (props: IUseUploadProps = {}) => {
    */
   const uploadOnBefore = (file: RcFile, FileList: RcFile[]) => {
     console.log('=>(home.tsx:100) uploadOnBefore', file, FileList);
+
     /** 解析文件*/
     onImportJson(file);
+
     /** 判断文件类型*/
     if (typeof onBefore === 'function') {
       return onBefore(file, FileList);
     }
+
     return true;
   }
 
   /**
    * 上传文件改变时的回调，上传每个阶段都会触发该事件
-   * @param info {UploadChangeParam}
+   * @param info {UploadChangeParam<UploadFile>>}
    */
   const uploadOnChange: UploadProps['onChange'] = (info) => {
-    console.log('=>(home.tsx:140) uploadOnChange', info);
+
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
     }
+
     if (info.file.status === 'done') {
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
+
     typeof onChange === 'function' && onChange(info.file.status, info);
+
     let newFileList = [...info.fileList];
+
     // 限制上传文件数量, 仅上传最新的一个文件
     newFileList = newFileList.slice(-1);
     newFileList = newFileList.map((file) => {
@@ -124,6 +155,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
       }
       return file;
     });
+
     setFileList(newFileList);
   };
 
@@ -132,9 +164,9 @@ const useUpload = (props: IUseUploadProps = {}) => {
     name: 'file',
     action: '',
     accept: '.json',
-    maxCount,
     showUploadList: false,
-    multiple: false,
+    multiple: maxCount > 1,
+    maxCount,
     fileList,
     beforeUpload: uploadOnBefore,
     onChange: uploadOnChange

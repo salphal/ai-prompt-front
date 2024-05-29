@@ -3,7 +3,6 @@ import TextOverflowTip from "@/components/text-overflow-tip";
 import JsonViewer from "@/components/json-viewer";
 import {HolderOutlined} from "@ant-design/icons";
 
-
 export interface IUseTableColumnsProps {
   /** 表格配置 */
   columns?: Array<any>;
@@ -34,7 +33,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
   const [firstRowData, setFirstRowData] = useState<any>({});
   const [tableColumnKeys, setTableColumnKeys] = useState<Array<string>>([]);
-  const [tableColumnBlackKeys, setTableColumnBlackKeys] = useState<Array<string>>(['id']);
+  const [tableColumnBlackKeys, setTableColumnBlackKeys] = useState<Array<string>>([]);
 
   useEffect(() => {
     let columnKeys = [];
@@ -46,7 +45,6 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       setFirstRowData(rowData);
       columnKeys = Object.keys(rowData);
     }
-    console.log('=>(useTableColumns.tsx:48) columnKeys', columnKeys);
     setTableColumnKeys(columnKeys);
   }, [columns, tableData]);
 
@@ -80,7 +78,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       tableColumns = columns;
     } else if (Array.isArray(tableData) && tableData.length) {
       tableColumns = createTableColumns(tableData[0])
-        .filter((v: any) => tableColumnBlackKeys.includes(v.dataIndex) && tableColumnKeys.includes(v.dataIndex));
+        .filter((v: any) => tableColumnBlackKeys.includes(v.dataIndex));
     }
 
     if (tableColumns.length) {
@@ -99,7 +97,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     return Object.entries(obj)
       .map(([key, val]) => {
         const config = {
-          // key: key,
+          key: key,
           dataIndex: key,
           title: key,
           width: 200
