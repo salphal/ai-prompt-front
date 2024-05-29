@@ -23,6 +23,7 @@ import {
 import useTableColumns from "@/hooks/useTableColumns.tsx";
 import usePromptStore, {
   setColumnFilterValue,
+  setColumnKeys,
   setDataSource,
   setDefaultRowData,
   setFormData,
@@ -93,7 +94,13 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       );
     }
   }
-  const {tableColumns, setFilterColumns} = useTableColumns({tableData: dataSource, operations: tableOperationsColumn})
+  const {tableColumns, tableColumnKeys, setTableColumnBlackKeys} = useTableColumns({
+    tableData: dataSource,
+    operations: tableOperationsColumn,
+    dragAble: true,
+    indexAble: true,
+    operationAble: true
+  });
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditable, setIsEditable] = useState<boolean>(false);
@@ -105,6 +112,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
+
+  useEffect(() => {
+    setColumnKeys(tableColumnKeys)
+  }, [tableColumnKeys]);
 
   useLayoutEffect(() => {
     setLoading(true);
@@ -127,7 +138,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }, [formData]);
 
   useEffect(() => {
-    setFilterColumns((prev: any[]) => [...columnFilterValue]);
+    setTableColumnBlackKeys((prev: any[]) => [...columnFilterValue]);
   }, [columnFilterValue])
 
   const dataSourceByFilter = useMemo(() => () => {
