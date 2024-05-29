@@ -37,7 +37,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
   }
 
   const {uploadProps, onExportFile} = useUpload({
-    maxCount: 3,
+    maxCount: 100,
     onBefore: () => false,
     onParseJson: fileOnParse
   });
