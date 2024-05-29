@@ -129,7 +129,13 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
                   allowClear
                 />}
               {getArrayItemType(options) === 'number' &&
-                <InputNumber placeholder="Please input merge value" step={10} changeOnWheel/>}
+                <InputNumber
+                  className={classNames(['!w-full'])}
+                  placeholder="Please input merge value"
+                  step={10}
+                  changeOnWheel
+                />
+              }
               {getArrayItemType(options) === 'boolean' &&
                 <Switch/>}
             </Form.Item>
