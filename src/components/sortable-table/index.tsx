@@ -20,7 +20,7 @@ const Row = (props: RowProps) => {
     transform: CSS.Translate.toString(transform),
     transition,
     cursor: 'move',
-    ...(isDragging ? {position: 'relative', zIndex: 9999} : {}),
+    ...(isDragging ? {position: 'relative', zIndex: 999} : {}),
   };
 
   return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
