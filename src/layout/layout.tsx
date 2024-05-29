@@ -5,10 +5,10 @@ import classNames from "classnames";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Upload} from "antd";
 import {DownloadOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
-import useUpload from "@/hooks/useUpload.ts";
+import useUpload, {IFile} from "@/hooks/useUpload.ts";
 import usePromptStore, {resetPromptStore, setColumnFilterValue, setDataSource} from "@/store/prompt.ts";
-import {v4 as uuidv4} from "uuid";
 import {useShallow} from "zustand/react/shallow";
+import {v4 as uuidv4} from "uuid";
 import {tableColumnBlackList} from "@/constants/table.ts";
 
 export interface LayoutProps {
@@ -23,26 +23,31 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
 
   const {
     dataSource,
+    columnFilterValue
   } = usePromptStore(useShallow((state: any) => state));
 
   const {} = props;
 
-  const {uploadProps, fileContent, onExportFile} = useUpload({
-    onBefore: () => false
+  const fileOnParse = (file: IFile) => {
+    if (file && Array.isArray(file.content)) {
+      const data = file.content.map((v: any) => ({...v, id: uuidv4()}));
+      setDataSource(data);
+    }
+  }
+
+  const {uploadProps, onExportFile} = useUpload({
+    maxCount: 3,
+    onBefore: () => false,
+    onParseJson: fileOnParse
   });
 
   useEffect(() => {
-    if (!Array.isArray(fileContent.content) || !fileContent.content.length) return;
-
-    const data = fileContent.content.map((v: any) => ({...v, id: uuidv4()}));
-    setDataSource(data);
-
-    if (data.length) {
-      const firstRowData = data[0];
-      const allColumnKeys = Object.keys(firstRowData).filter((k: string) => !tableColumnBlackList.includes(k));
-      setColumnFilterValue(allColumnKeys);
+    if (Array.isArray(dataSource) && dataSource.length === 1) {
+      const firstRowData = dataSource[0];
+      const allColumnKeys = Object.keys(firstRowData);
+      setColumnFilterValue(allColumnKeys.filter((v: any) => !tableColumnBlackList.includes(v)));
     }
-  }, [fileContent]);
+  }, [dataSource]);
 
   const handlePromptEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
 
