@@ -17,7 +17,7 @@ export interface IPromptStore {
 export const initialPromptData = {
   dataSource: [],
   selectedRowKeys: [],
-  columnFilterValue: [],
+  columnFilterKeys: [],
 
   columnKeys: [],
   defaultRowData: {},
@@ -81,8 +81,8 @@ export const setPromptContextById = (id: any, value: any) =>
 export const resetDataSource = () =>
   setPromptProperty('dataSource', initialPromptData.dataSource, false);
 
-export const setColumnFilterValue = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('columnFilterValue', value, merge, insertBefore, isDeconstruct);
+export const setColumnFilterKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+  setPromptProperty('columnFilterKeys', value, merge, insertBefore, isDeconstruct);
 
 export const setColumnKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {ProLayout,} from '@ant-design/pro-components';
 import Styles from "./index.module.scss";
 import classNames from "classnames";
@@ -6,7 +6,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {Button, Upload} from "antd";
 import {DownloadOutlined, RedoOutlined, UploadOutlined} from "@ant-design/icons";
 import useUpload, {IFile} from "@/hooks/useUpload.ts";
-import usePromptStore, {resetPromptStore, setColumnFilterValue, setDataSource} from "@/store/prompt.ts";
+import usePromptStore, {resetPromptStore, setColumnFilterKeys, setDataSource} from "@/store/prompt.ts";
 import {useShallow} from "zustand/react/shallow";
 import {v4 as uuidv4} from "uuid";
 import {tableColumnBlackList} from "@/constants/table.ts";
@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
 
   const {
     dataSource,
-    columnFilterValue
+    columnFilterKeys
   } = usePromptStore(useShallow((state: any) => state));
 
   const {} = props;
@@ -32,6 +32,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
     if (file && Array.isArray(file.content)) {
       const data = file.content.map((v: any) => ({...v, id: uuidv4()}));
       setDataSource(data);
+      updateColumnFilterKeys(data);
     }
   }
 
@@ -41,13 +42,13 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
     onParseJson: fileOnParse
   });
 
-  useEffect(() => {
-    if (Array.isArray(dataSource) && dataSource.length === 1) {
-      const firstRowData = dataSource[0];
+  const updateColumnFilterKeys = (tableData: Array<any>) => {
+    if (Array.isArray(tableData) && tableData.length) {
+      const firstRowData = tableData[0];
       const allColumnKeys = Object.keys(firstRowData);
-      setColumnFilterValue(allColumnKeys.filter((v: any) => !tableColumnBlackList.includes(v)));
+      setColumnFilterKeys(allColumnKeys.filter((v: any) => !tableColumnBlackList.includes(v)));
     }
-  }, [dataSource]);
+  };
 
   const handlePromptEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
 

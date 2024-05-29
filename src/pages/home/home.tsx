@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import useTableColumns from "@/hooks/useTableColumns.tsx";
 import usePromptStore, {
-  setColumnFilterValue,
+  setColumnFilterKeys,
   setColumnKeys,
   setDataSource,
   setDefaultRowData,
@@ -58,7 +58,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   const {
     dataSource,
     columnKeysOptions,
-    columnFilterValue,
+    columnFilterKeys,
     columnKeys,
     selectedRowKeys,
     defaultRowData,
@@ -137,8 +137,8 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }, [formData]);
 
   useEffect(() => {
-    setTableColumnBlackKeys((prev: any[]) => [...columnFilterValue]);
-  }, [columnFilterValue])
+    setTableColumnBlackKeys((prev: any[]) => [...columnFilterKeys]);
+  }, [columnFilterKeys])
 
   const dataSourceByFilter = useMemo(() => () => {
     const queryKey = formData[FILTER_KEYS.key];
@@ -237,11 +237,11 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const tableFilterOnChange = (value: Array<any>) => {
-    setColumnFilterValue(value);
+    setColumnFilterKeys(value);
   };
 
   const selectedAllOnChange = () => {
-    setColumnFilterValue((prev: any[]) => prev.length === columnKeys.length ? [] : columnKeys);
+    setColumnFilterKeys((prev: any[]) => prev.length === columnKeys.length ? [] : columnKeys);
   }
 
   return (
@@ -293,7 +293,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
                 <Checkbox.Group
                   className={classNames(['table-filter', 'flex', 'flex-col'])}
                   options={columnKeysOptions()}
-                  value={columnFilterValue}
+                  value={columnFilterKeys}
                   onChange={tableFilterOnChange}
                 />
               </div>}
@@ -301,7 +301,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               placement="bottomLeft"
             >
               <Button
-                icon={columnKeys.length - 1 === columnFilterValue.length || columnFilterValue.length === 0
+                icon={columnKeys.length - 1 === columnFilterKeys.length || columnFilterKeys.length === 0
                   ? <FilterOutlined/>
                   : <FilterFilled style={{color: '#000'}}/>}
                 onClick={() => handlePromptEventAspect('filter')}
