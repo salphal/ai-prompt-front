@@ -87,11 +87,6 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
           </Upload>
           <Button
             className={'mr-3'}
-            icon={<DownloadOutlined/>}
-            onClick={() => handlePromptEventAspect('importJson')}
-          >Json</Button>
-          <Button
-            className={'mr-3'}
             icon={<UploadOutlined/>}
             onClick={() => handlePromptEventAspect('exportFile')}
           >Export</Button>
