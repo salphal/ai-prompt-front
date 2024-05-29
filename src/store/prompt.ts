@@ -2,7 +2,6 @@ import {create} from 'zustand';
 import {createJSONStorage, persist} from "zustand/middleware";
 import {setStoreProperties} from "@/utils/zustand.ts";
 import {createSelectOptions} from "@/utils/antd/select.ts";
-import {tableColumnBlackList} from "@/constants/table.ts";
 
 export interface IPromptStore {
   /** 提示词数据 */
@@ -38,7 +37,7 @@ const usePromptStore = create(
       // data: [],
       // setData: () => set(state => ({data: state.count})),
       // getData: () => get().data.map((v: any) => !!v),
-      columnKeysOptions: () => createSelectOptions(get().columnKeys.filter((k: string) => !tableColumnBlackList.includes(k))),
+      columnKeysOptions: () => createSelectOptions(get().columnKeys),
       contextKeysOptions: () => {
         const contextData = get().contextData;
         if (!Array.isArray(contextData) || !contextData.length) return [];
@@ -67,7 +66,7 @@ export const setPromptProperty = (
 ) =>
   setStoreProperties(usePromptStore, key, value, merge, insertBefore, isDeconstruct);
 
-export const setDataSource = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
+export const setDataSource = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
   setPromptProperty('dataSource', value, merge, insertBefore, isDeconstruct);
 
 export const setDataSourceById = (id: any, value: any) =>
