@@ -1,13 +1,22 @@
 import {useEffect, useMemo, useState} from "react";
 import TextOverflowTip from "@/components/text-overflow-tip";
 import JsonViewer from "@/components/json-viewer";
-import {setColumnKeys} from "@/store/prompt.ts";
 import {HolderOutlined} from "@ant-design/icons";
 
+
 export interface IUseTableColumnsProps {
+  /** 表格配置 */
   columns?: Array<any>;
+  /** 表格数据 */
   tableData?: Array<any>;
+  /** 操作列 */
   operations?: any;
+  /** 索引列 */
+  indexAble?: boolean;
+  /** 拖拽列 */
+  dragAble?: boolean;
+  /** 操作列 */
+  operationAble?: boolean;
 
   [key: string]: any;
 }
@@ -17,86 +26,98 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
   const {
     tableData,
     columns,
+    indexAble = false,
+    dragAble = false,
+    operationAble = false,
     operations = {}
   } = props;
 
-  const [filterColumns, setFilterColumns] = useState<Array<any>>([]);
+  const [firstRowData, setFirstRowData] = useState<any>({});
+  const [tableColumnKeys, setTableColumnKeys] = useState<Array<string>>([]);
+  const [tableColumnBlackKeys, setTableColumnBlackKeys] = useState<Array<string>>(['id']);
 
   useEffect(() => {
     let columnKeys = [];
-
     if (Array.isArray(columns) && columns.length) {
       columnKeys = columns.map(column => column.dataIndex);
     }
-
     if (Array.isArray(tableData) && tableData.length) {
-      columnKeys = Object.keys(tableData[0]);
+      const rowData = tableData[0];
+      setFirstRowData(rowData);
+      columnKeys = Object.keys(rowData);
     }
-
-    setFilterColumns(columnKeys);
-    setColumnKeys(columnKeys);
+    console.log('=>(useTableColumns.tsx:48) columnKeys', columnKeys);
+    setTableColumnKeys(columnKeys);
   }, [columns, tableData]);
 
   const tableColumns = useMemo(() => () => {
 
     let tableColumns = [];
 
-    const sortColumn = {key: 'sort', align: 'center', width: 80, render: () => <HolderOutlined/>}
+    const sortColumn = {
+      key: "table-sort-column",
+      align: "center",
+      width: 80,
+      render: () => <HolderOutlined/>
+    };
 
     const indexColumn = {
-      key: 'index',
+      key: "table-index-column",
       title: "No",
       width: 80,
-      render: (_: any, __: any, i: number) => i,
+      render: (_: any, __: any, i: number) => i
     };
 
     const operationsColumn = {
-      key: 'table-operations-column',
-      title: 'operations',
+      key: "table-operations-column",
+      title: "operations",
       width: 240,
-      fixed: 'right' as any,
+      fixed: "right" as any,
       ...operations
     };
 
     if (Array.isArray(columns) && columns.length) {
       tableColumns = columns;
     } else if (Array.isArray(tableData) && tableData.length) {
-      tableColumns = createTableColumns(tableData[0]);
+      tableColumns = createTableColumns(tableData[0])
+        .filter((v: any) => tableColumnBlackKeys.includes(v.dataIndex) && tableColumnKeys.includes(v.dataIndex));
     }
 
-    const blackList = ['id'];
-    tableColumns = tableColumns.filter((v => !blackList.includes(v.dataIndex) && filterColumns.includes(v.dataIndex)));
+    if (tableColumns.length) {
+      if (dragAble) tableColumns.unshift(sortColumn);
+      if (indexAble) tableColumns.unshift(indexColumn);
+      if (operationAble) tableColumns.push(operationsColumn);
+      return tableColumns;
+    }
 
-    return tableColumns.length ? [sortColumn, indexColumn, ...tableColumns, operationsColumn] : [];
+    return [];
 
-  }, [columns, tableData, filterColumns]);
+  }, [columns, tableData, tableColumnBlackKeys]);
 
   const createTableColumns = (obj: { [key: string]: any }) => {
     if (!Object.keys(obj).length) return [];
     return Object.entries(obj)
       .map(([key, val]) => {
         const config = {
-          key: key,
+          // key: key,
           dataIndex: key,
           title: key,
-          width: 200,
-          valueType: typeof val !== 'object' ? 'text' : 'input'
+          width: 200
+          // valueType: typeof val !== 'object' ? 'text' : 'input'
         };
         return {
           ...config,
-          render: (text: any, record: any, index: number) => renderColumn(config, text, record, index),
-        }
+          render: (text: any, record: any, index: number) => renderColumn(config, text, record, index)
+        };
       });
   };
 
   const renderColumn = (config: any, text: any, record: any, index: number) => {
-    if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(text))) {
+    if ((typeof text === "object" && text !== null)) {
       return renderJsonView(text, config);
-    } else {
-      return renderTextColumn(text, config);
     }
-    return String(text);
-  }
+    return renderTextColumn(text, config);
+  };
 
   const renderJsonView = (text: any, config: any) =>
     <TextOverflowTip
@@ -109,9 +130,12 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     <TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
 
   return {
-    filterColumns,
-    setFilterColumns,
-    tableColumns: tableColumns(),
+    firstRowData,
+    tableColumnKeys,
+    setTableColumnKeys,
+    tableColumnBlackKeys,
+    setTableColumnBlackKeys,
+    tableColumns: tableColumns()
   };
 };
 
