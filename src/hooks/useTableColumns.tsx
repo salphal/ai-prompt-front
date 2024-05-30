@@ -31,7 +31,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     operations = {}
   } = props;
 
-  const [firstRowData, setFirstRowData] = useState<any>({});
+  const [rowData, setRowData] = useState<any>({});
   const [tableColumnKeys, setTableColumnKeys] = useState<Array<string>>([]);
   const [tableColumnBlackKeys, setTableColumnBlackKeys] = useState<Array<string>>([]);
 
@@ -41,8 +41,11 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       columnKeys = columns.map(column => column.dataIndex);
     }
     if (Array.isArray(tableData) && tableData.length) {
-      const rowData = tableData[0];
-      setFirstRowData(rowData);
+      let rowData: any = {};
+      tableData.forEach((v => {
+        rowData = {...rowData, ...v}
+      }));
+      setRowData(rowData);
       columnKeys = Object.keys(rowData);
     }
     setTableColumnKeys(columnKeys);
@@ -52,6 +55,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
     let tableColumns = [];
 
+    /** 排序列 */
     const sortColumn = {
       key: "table-sort-column",
       align: "center",
@@ -59,6 +63,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       render: () => <HolderOutlined/>
     };
 
+    /** 索引列 */
     const indexColumn = {
       key: "table-index-column",
       title: "No",
@@ -66,6 +71,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
       render: (_: any, __: any, i: number) => i
     };
 
+    /** 操作列 */
     const operationsColumn = {
       key: "table-operations-column",
       title: "operations",
@@ -77,7 +83,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     if (Array.isArray(columns) && columns.length) {
       tableColumns = columns;
     } else if (Array.isArray(tableData) && tableData.length) {
-      tableColumns = createTableColumns(tableData[0])
+      tableColumns = createTableColumns(rowData)
         .filter((v: any) => tableColumnBlackKeys.includes(v.dataIndex));
     }
 
@@ -90,7 +96,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
 
     return [];
 
-  }, [columns, tableData, tableColumnBlackKeys]);
+  }, [columns, tableData, tableColumnBlackKeys, rowData]);
 
   const createTableColumns = (obj: { [key: string]: any }) => {
     if (!Object.keys(obj).length) return [];
@@ -128,7 +134,7 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     <TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
 
   return {
-    firstRowData,
+    firstRowData: rowData,
     tableColumnKeys,
     setTableColumnKeys,
     tableColumnBlackKeys,
