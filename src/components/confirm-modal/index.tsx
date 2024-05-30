@@ -1,18 +1,7 @@
-import React, {
-  ForwardRefRenderFunction,
-  ReactNode,
-  Ref,
-  useImperativeHandle,
-  useMemo,
-  useState
-} from "react";
+import React, {ForwardRefRenderFunction, ReactNode, Ref, useImperativeHandle, useMemo, useState} from "react";
 import {Button, Modal, Spin} from "antd";
 import {Scrollbars} from "react-custom-scrollbars-2";
-import {
-  CheckCircleFilled,
-  CloseOutlined,
-  InfoCircleFilled
-} from "@ant-design/icons";
+import {CheckCircleFilled, CloseOutlined, InfoCircleFilled} from "@ant-design/icons";
 
 const modalIconList: any = {
   info: <InfoCircleFilled style={{color: "#0166FF"}}/>,
@@ -20,14 +9,59 @@ const modalIconList: any = {
   danger: <InfoCircleFilled style={{color: "#f31c1c"}}/>
 };
 
-export interface IModalContentStyle {
-  [key: string]: any;
+const ModalLoading = (props: any) => {
+  const {loading = false} = props;
+  return loading && (
+    <Spin
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        zIndex: 9999,
+        transform: "translate(-50%, -50%)"
+      }}
+    />
+  );
+}
 
+const ModalMask = (props: any) => {
+  const {
+    isShow = false,
+    onClick = () => {
+    }
+  } = props;
+  return isShow && (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "transparent",
+        zIndex: 9998,
+        cursor: "not-allowed"
+      }}
+      onClick={onClick}
+    />
+  )
+};
+
+export interface ModalStyle {
   header: any;
   body: any;
   mask: any;
   footer: any;
   content: any;
+
+  [key: string]: any;
+}
+
+export interface ModalContentStyle {
+  /** 弹窗内容区那边距 */
+  padding?: string | number;
+
+  [key: string]: any;
 }
 
 export interface ConfirmModalProps {
@@ -38,31 +72,27 @@ export interface ConfirmModalProps {
   loading?: boolean;
   /** 是否禁用 */
   disabled?: boolean;
+  /** 自动关闭 */
+  closedAble?: boolean;
+  /** 内容区域是否可以滚动 */
+  contentScrollable?: boolean;
 
   /** 自定义底部控制按钮 */
   footer?: ReactNode;
   /** 弹窗消息内容 */
-
   message?: string;
   /** 弹窗消息icon类型 */
   messageIconType?: string;
 
-  /** 弹窗距离顶部的位置 */
-  top: string | number;
-  /** 弹窗宽度 */
-  width?: string | number;
-  /** 弹窗高度 */
-  height?: string | number;
-
-  /** 弹窗内容区那边距 */
-  contentPadding?: string | number;
-  /** 自动关闭 */
-  closedAble?: boolean;
-
   /** 自定义样式对象 */
-  styles?: IModalContentStyle;
-  /** 弹窗内容区域样式 */
-  contentStyles?: object;
+  styles?: ModalStyle;
+  /** Body 区域样式 */
+  contentStyles?: ModalContentStyle;
+
+  /** 确认按钮文字 */
+  confirmBtnText?: string;
+  /** 取消按钮文字 */
+  cancelBtnText?: string;
 
   /** 确认按钮事件 */
   onConfirm?: () => void;
@@ -88,23 +118,29 @@ const ConfirmModal: ForwardRefRenderFunction<
 > = (props: ConfirmModalProps, ref: Ref<ConfirmModalRef | HTMLDivElement>) => {
   const {
     title = "提示",
+    footer,
+
     loading = false,
     disabled = false,
-    footer,
+    closedAble = true,
+    contentScrollable = false,
 
     message = "",
     messageIconType = "",
 
-    top = "20%",
-    width = 500,
-    height = "auto",
-    contentPadding = "12px",
-    styles = {},
+    styles = {
+      top: "20%",
+      width: 500,
+      height: "auto",
+    },
     contentStyles = {
-      height: 300
-    } as any,
+      padding: "0 0 20px 0",
+      height: "300px"
+    },
 
-    closedAble = true,
+    confirmBtnText = '确认',
+    cancelBtnText = '取消',
+
     onConfirm,
     onCancel,
     onClose,
@@ -127,7 +163,8 @@ const ConfirmModal: ForwardRefRenderFunction<
   const modalStyles = {
     header: {},
     body: {
-      padding: contentPadding
+      overflow: 'hidden',
+      ...contentStyles
     },
     mask: {},
     footer: {
@@ -200,13 +237,13 @@ const ConfirmModal: ForwardRefRenderFunction<
         onClick={() => handleConfirmModalEventAspect("confirm")}
         loading={loading}
       >
-        确认
+        {confirmBtnText}
       </Button>
       <Button
         onClick={() => handleConfirmModalEventAspect("cancel")}
         disabled={loading}
       >
-        取消
+        {cancelBtnText}
       </Button>
     </>
   );
@@ -232,11 +269,20 @@ const ConfirmModal: ForwardRefRenderFunction<
     };
   }, [messageIconType, message]);
 
-  const content = message
+  const child = message
     ? promptMessage()
-    : typeof children === "function"
-      ? children(props)
-      : children;
+    : typeof children === "function" ? children(props) : children;
+
+  const content = (
+    <>
+      <ModalLoading loading={loading}/>
+      <ModalMask
+        isShow={Boolean(loading || disabled)}
+        onClick={() => handleConfirmModalEventAspect("disabled")}
+      />
+      {child}
+    </>
+  );
 
   return (
     <React.Fragment>
@@ -245,8 +291,11 @@ const ConfirmModal: ForwardRefRenderFunction<
           title={title}
           open={isOpen}
           footer={footer ? footer : defaultFooter}
-          width={width}
-          style={{top, height}}
+          width={styles.width}
+          style={{
+            top: styles.top,
+            height: styles.height
+          }}
           styles={modalStyles}
           closeIcon={
             <CloseOutlined
@@ -257,43 +306,11 @@ const ConfirmModal: ForwardRefRenderFunction<
           afterClose={() => handleConfirmModalEventAspect("afterClose")}
           {...restProps}
         >
-          <Scrollbars
-            style={{height: contentStyles.height}}
-            autoHide
-          >
-            <section
-              className={"modal-content"}
-              style={{padding: 20, ...contentStyles}}
-            >
-              {loading && (
-                <Spin
-                  style={{
-                    position: "absolute",
-                    left: "50%",
-                    top: "50%",
-                    zIndex: 9999,
-                    transform: "translate(-50%, -50%)"
-                  }}
-                />
-              )}
-              {Boolean(loading || disabled) && (
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "transparent",
-                    zIndex: 9998,
-                    cursor: "not-allowed"
-                  }}
-                  onClick={() => handleConfirmModalEventAspect("disabled")}
-                />
-              )}
+          {contentScrollable ?
+            <Scrollbars style={{height: contentStyles.height}} autoHide>
               {content}
-            </section>
-          </Scrollbars>
+            </Scrollbars>
+            : content}
         </Modal>
       )}
     </React.Fragment>
