@@ -5,6 +5,7 @@ import React, {
   useImperativeHandle,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState
 } from "react";
 import classNames from "classnames";
@@ -14,6 +15,7 @@ import useClientRect from "@/hooks/useClientRect.ts";
 import {
   CopyOutlined,
   DeleteOutlined,
+  DiffOutlined,
   FilterFilled,
   FilterOutlined,
   FormOutlined,
@@ -38,6 +40,8 @@ import {resetObject} from "@/utils/format.ts";
 import Countdown from "@/utils/count-down.ts";
 import "./index.scss";
 import SortableTable from "@/components/sortable-table";
+import EditTableColumns from "@/pages/home/components/edit-table-columns";
+import {HomeContextProvider} from "@/pages/home/context.ts";
 
 export interface HomeProps {
   [key: string]: any;
@@ -93,7 +97,12 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       );
     }
   }
-  const {tableColumns, tableColumnKeys, setTableColumnBlackKeys} = useTableColumns({
+  const {
+    tableColumns,
+    tableColumnKeys,
+    setTableColumnBlackKeys,
+    rowData
+  } = useTableColumns({
     tableData: dataSource,
     operations: tableOperationsColumn,
     dragAble: true,
@@ -108,6 +117,8 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     pageSize: 100,
     total: 0
   });
+
+  const editTableColumnModalRef = useRef<any>(null);
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -174,6 +185,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
       search: handlePromptOnSearch,
       edit: handlePromptOnEdit,
       editable: handlePromptOnEditable,
+      editColumns: handlePromptOnEditColumns,
       prompt: handlePromptOnPrompt,
       add: handlePromptOnAdd,
       delete: handlePromptOnDelete,
@@ -198,6 +210,10 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
 
   const handlePromptOnEditable = (record: any) => {
     setIsEditable(prev => !prev);
+  };
+
+  const handlePromptOnEditColumns = (record: any) => {
+    editTableColumnModalRef.current.showModal();
   };
 
   const handlePromptOnPrompt = (record: any) => {
@@ -247,101 +263,113 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   return (
     <React.Fragment>
 
-      <div className={'flex flex-col justify-between h-full'}>
-        <div className={classNames(['flex', 'flex-row', 'justify-between', 'items-center'])}>
-          <Form form={form} layout={'inline'} onValuesChange={formOnValueChange}>
-            <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
-              <Select style={{width: 180}} options={columnKeysOptions()}/>
-            </Form.Item>
-            <Form.Item name={FILTER_KEYS.query} label={FILTER_LABELS[FILTER_KEYS.query]}>
-              <Input style={{width: 200}} allowClear/>
-            </Form.Item>
-          </Form>
-          <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
-            {!isEditable && <>
+      <HomeContextProvider value={{
+        rowData
+      }}>
+
+        <div className={'flex flex-col justify-between h-full'}>
+          <div className={classNames(['flex', 'flex-row', 'justify-between', 'items-center'])}>
+            <Form form={form} layout={'inline'} onValuesChange={formOnValueChange}>
+              <Form.Item name={FILTER_KEYS.key} label={FILTER_LABELS[FILTER_KEYS.key]}>
+                <Select style={{width: 180}} options={columnKeysOptions()}/>
+              </Form.Item>
+              <Form.Item name={FILTER_KEYS.query} label={FILTER_LABELS[FILTER_KEYS.query]}>
+                <Input style={{width: 200}} allowClear/>
+              </Form.Item>
+            </Form>
+            <div className={classNames(['flex', 'justify-end', 'items-center', 'h-16'])}>
+              {!isEditable && <>
+                <Button
+                  className={'mr-3'}
+                  icon={<PlusOutlined/>}
+                  onClick={() => handlePromptEventAspect('add')}
+                >Add</Button>
+                <Button
+                  className={'mr-3'}
+                  icon={<CopyOutlined/>}
+                  onClick={() => handlePromptEventAspect('copy')}
+                >Copy</Button>
+                <Button
+                  className={'mr-3'}
+                  icon={<DeleteOutlined/>}
+                  onClick={() => handlePromptEventAspect('delete')}
+                >Delete</Button>
+                <Button
+                  className={'mr-3'}
+                  icon={<MergeCellsOutlined/>}
+                  onClick={() => handlePromptEventAspect('merge')}
+                >Merge</Button>
+              </>}
               <Button
                 className={'mr-3'}
-                icon={<PlusOutlined/>}
-                onClick={() => handlePromptEventAspect('add')}
-              >Add</Button>
+                icon={<FormOutlined/>}
+                onClick={() => handlePromptEventAspect('editable')}
+              >{isEditable ? 'Editable' : 'UnEditable'}</Button>
               <Button
                 className={'mr-3'}
-                icon={<CopyOutlined/>}
-                onClick={() => handlePromptEventAspect('copy')}
-              >Copy</Button>
-              <Button
-                className={'mr-3'}
-                icon={<DeleteOutlined/>}
-                onClick={() => handlePromptEventAspect('remove')}
-              >Delete</Button>
-              <Button
-                className={'mr-3'}
-                icon={<MergeCellsOutlined/>}
-                onClick={() => handlePromptEventAspect('merge')}
-              >Merge</Button>
-            </>}
-            <Button
-              className={'mr-3'}
-              icon={<FormOutlined/>}
-              onClick={() => handlePromptEventAspect('editable')}
-            >{isEditable ? 'Editable' : 'UnEditable'}</Button>
-            <Popover
-              content={<div className={classNames(['pb-6'])}>
-                <div className={classNames(['flex', 'justify-end', 'm-3'])}>
-                  <Button size={'small'} onClick={selectedAllOnChange}>Select all</Button>
-                </div>
-                <Checkbox.Group
-                  className={classNames(['table-filter', 'flex', 'flex-col'])}
-                  options={columnKeysOptions()}
-                  value={columnFilterKeys}
-                  onChange={tableFilterOnChange}
+                icon={<DiffOutlined/>}
+                onClick={() => handlePromptEventAspect('editColumns')}
+              >Edit Columns</Button>
+              <Popover
+                content={<div className={classNames(['pb-6'])}>
+                  <div className={classNames(['flex', 'justify-end', 'm-3'])}>
+                    <Button size={'small'} onClick={selectedAllOnChange}>Select all</Button>
+                  </div>
+                  <Checkbox.Group
+                    className={classNames(['table-filter', 'flex', 'flex-col'])}
+                    options={columnKeysOptions()}
+                    value={columnFilterKeys}
+                    onChange={tableFilterOnChange}
+                  />
+                </div>}
+                trigger="click"
+                placement="bottomLeft"
+              >
+                <Button
+                  icon={columnKeys.length - 1 === columnFilterKeys.length || columnFilterKeys.length === 0
+                    ? <FilterOutlined/>
+                    : <FilterFilled style={{color: '#000'}}/>}
+                  onClick={() => handlePromptEventAspect('filter')}
                 />
-              </div>}
-              trigger="click"
-              placement="bottomLeft"
-            >
-              <Button
-                icon={columnKeys.length - 1 === columnFilterKeys.length || columnFilterKeys.length === 0
-                  ? <FilterOutlined/>
-                  : <FilterFilled style={{color: '#000'}}/>}
-                onClick={() => handlePromptEventAspect('filter')}
-              />
-            </Popover>
+              </Popover>
+            </div>
+          </div>
+          <div id={'table-wrapper'} className={'flex-1'}>
+            {!isEditable ?
+              <SortableTable
+                loading={loading}
+                rowKey={(record: any) => record.key || record.id}
+                dataSource={dataSourceByFilter()}
+                columns={tableColumns}
+                pagination={false}
+                scroll={tableScroll}
+                rowSelection={(!loading && Array.isArray(dataSource) && dataSource.length && columnFilterKeys.length)
+                  ? tableRowSelection : null}
+              /> :
+              <EditableTable
+                loading={loading}
+                dataSource={dataSource}
+                onChange={setDataSource}
+                columns={tableColumns}
+                scroll={tableScroll}
+              />}
+          </div>
+          <div className={'py-2'}>
+            <Pagination
+              className={'float-right'}
+              current={paginationConfig.current}
+              pageSize={paginationConfig.pageSize}
+              total={paginationConfig.total}
+              onChange={paginationOnChange}
+              showSizeChanger
+              showQuickJumper
+            />
           </div>
         </div>
-        <div id={'table-wrapper'} className={'flex-1'}>
-          {!isEditable ?
-            <SortableTable
-              loading={loading}
-              rowKey={(record: any) => record.key || record.id}
-              dataSource={dataSourceByFilter()}
-              columns={tableColumns}
-              pagination={false}
-              scroll={tableScroll}
-              rowSelection={(!loading && Array.isArray(dataSource) && dataSource.length && columnFilterKeys.length)
-                ? tableRowSelection : null}
-            /> :
-            <EditableTable
-              loading={loading}
-              dataSource={dataSource}
-              onChange={setDataSource}
-              columns={tableColumns}
-              scroll={tableScroll}
-            />}
-        </div>
-        <div className={'py-2'}>
-          <Pagination
-            className={'float-right'}
-            current={paginationConfig.current}
-            pageSize={paginationConfig.pageSize}
-            total={paginationConfig.total}
-            onChange={paginationOnChange}
-            showSizeChanger
-            showQuickJumper
-          />
-        </div>
 
-      </div>
+        <EditTableColumns ref={editTableColumnModalRef}/>
+
+      </HomeContextProvider>
 
     </React.Fragment>
   );
