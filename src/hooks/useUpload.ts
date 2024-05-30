@@ -11,13 +11,13 @@ export interface IFile {
 }
 
 export interface IUseUploadProps {
-  [key: string]: any;
-
   maxCount?: number;
   defaultProps?: UploadProps;
   onBefore?: (file: RcFile, FileList: RcFile[]) => boolean;
   onChange?: (status: UploadFileStatus | undefined, info: any) => void;
   onParseJson?: (file: IFile) => void;
+
+  [key: string]: any;
 }
 
 /**
@@ -80,9 +80,9 @@ const useUpload = (props: IUseUploadProps = {}) => {
 
       if (result) {
         typeof onParseJson === 'function' && onParseJson(file);
-        message.success('文件解析成功!')
+        message.success(`${name} 解析成功!`)
       } else {
-        message.warning('解析文件内容为空!');
+        message.warning(`${name} 解析文件内容为空!`);
       }
     };
   };
