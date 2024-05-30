@@ -3,6 +3,7 @@ import TextOverflowTip from "@/components/text-overflow-tip";
 import JsonViewer from "@/components/json-viewer";
 import {HolderOutlined} from "@ant-design/icons";
 
+
 export interface IUseTableColumnsProps {
   /** 表格配置 */
   columns?: Array<any>;
@@ -42,9 +43,9 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     }
     if (Array.isArray(tableData) && tableData.length) {
       let rowData: any = {};
-      tableData.forEach((v => {
-        rowData = {...rowData, ...v}
-      }));
+
+      tableData.forEach((v => rowData = {...rowData, ...v}));
+
       setRowData(rowData);
       columnKeys = Object.keys(rowData);
     }
@@ -134,7 +135,8 @@ const useTableColumns = (props: IUseTableColumnsProps = {}) => {
     <TextOverflowTip width={config.width}>{String(text)}</TextOverflowTip>;
 
   return {
-    firstRowData: rowData,
+    rowData,
+    setRowData,
     tableColumnKeys,
     setTableColumnKeys,
     tableColumnBlackKeys,
