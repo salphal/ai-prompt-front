@@ -44,9 +44,13 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
 
   const updateColumnFilterKeys = (tableData: Array<any>) => {
     if (Array.isArray(tableData) && tableData.length) {
-      const firstRowData = tableData[0];
-      const allColumnKeys = Object.keys(firstRowData);
-      setColumnFilterKeys(allColumnKeys.filter((v: any) => !tableColumnBlackList.includes(v)));
+      let rowData: any = {};
+      tableData.forEach((v => {
+        rowData = {...rowData, ...v}
+      }));
+      const allColumnKeys = Object.keys(rowData);
+      setColumnFilterKeys((prev: any[]) => [...new Set([...prev, ...allColumnKeys])]
+        .filter((v: any) => !tableColumnBlackList.includes(v)));
     }
   };
 
