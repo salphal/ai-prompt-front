@@ -305,7 +305,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
                   ? <FilterOutlined/>
                   : <FilterFilled style={{color: '#000'}}/>}
                 onClick={() => handlePromptEventAspect('filter')}
-              ></Button>
+              />
             </Popover>
           </div>
         </div>
@@ -318,7 +318,8 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
               columns={tableColumns}
               pagination={false}
               scroll={tableScroll}
-              rowSelection={(Array.isArray(dataSource) && dataSource.length && !loading) ? tableRowSelection : null}
+              rowSelection={(!loading && Array.isArray(dataSource) && dataSource.length && columnFilterKeys.length)
+                ? tableRowSelection : null}
             /> :
             <EditableTable
               loading={loading}
