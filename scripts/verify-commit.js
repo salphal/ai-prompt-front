@@ -5,8 +5,10 @@ const path = require('path');
 const commitMessage = require('fs')
   .readFileSync(path.resolve('.git/COMMIT_EDITMSG'), 'utf-8')
   .trim();
+console.log('=>(verify-commit.js:8) commitMessage', commitMessage);
 
 const commitRegExp = /^(S|R\d+\r?\n(?:M|m)essage: .{1,50})/;
+console.log('=>(verify-commit.js:11) commitRegExp', commitRegExp);
 
 if (!commitRegExp.test(commitMessage)) {
   console.log();
