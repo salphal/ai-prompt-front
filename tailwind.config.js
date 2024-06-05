@@ -1,7 +1,7 @@
 /* eslint-disable */
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
+  content: ['./src/**/*.{html,js,jsx,ts,tsx}'],
   theme: {
     theme: {
       screens: {
@@ -11,12 +11,12 @@ export default {
         xl: '1440px',
       },
       colors: {
-        'blue': '#1fb6ff',
-        'pink': '#ff49db',
-        'orange': '#ff7849',
-        'green': '#13ce66',
+        blue: '#1fb6ff',
+        pink: '#ff49db',
+        orange: '#ff7849',
+        green: '#13ce66',
         'gray-dark': '#273444',
-        'gray': '#8492a6',
+        gray: '#8492a6',
         'gray-light': '#d3dce6',
       },
       fontFamily: {
@@ -25,13 +25,13 @@ export default {
       },
       extend: {
         spacing: {
-          '128': '32rem',
-          '144': '36rem',
+          128: '32rem',
+          144: '36rem',
         },
         borderRadius: {
           '4xl': '2rem',
-        }
-      }
+        },
+      },
     },
     extend: {},
   },
@@ -41,5 +41,4 @@ export default {
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/container-queries'),
   ],
-}
-
+};

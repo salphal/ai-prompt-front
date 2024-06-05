@@ -9,10 +9,7 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'postcss.config.js'],
   parser: '@typescript-eslint/parser',
-  plugins: [
-    'react-refresh',
-    'prettier',
-  ],
+  plugins: ['react-refresh', 'prettier'],
   rules: {
     'react-refresh/only-export-components': 0,
     '@typescript-eslint/no-explicit-any': 0,
