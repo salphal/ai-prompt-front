@@ -1,7 +1,13 @@
-import React, {ForwardRefRenderFunction, Ref, useImperativeHandle, useMemo, useState} from "react";
-import classNames from "classnames";
-import {EditableProTable} from "@ant-design/pro-components";
-import {v4 as uuidv4} from 'uuid';
+import React, {
+  ForwardRefRenderFunction,
+  Ref,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
+import { EditableProTable } from '@ant-design/pro-components';
+import classNames from 'classnames';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface IColumnItem {
   title: string;
@@ -10,7 +16,7 @@ export interface IColumnItem {
   valueType?: 'text' | 'select' | 'option' | string;
   formItemProps: {
     [key: string]: any;
-    rules: Array<any>
+    rules: Array<any>;
   };
   valueEnum: {
     [key: string]: {
@@ -33,13 +39,13 @@ export interface EditableTableProps {
   /** 顶部工具行渲染函数 */
   toolBarRender?: () => Array<any>;
   /** 操作列渲染函数 */
-  optionColumnRender?: (row: any, config: any, defaultDoms: any) => Array<any>
+  optionColumnRender?: (row: any, config: any, defaultDoms: any) => Array<any>;
   /** 是否显示添加 */
   addable?: boolean;
   /** 单行默认数据 */
   defaultRowData?: any;
   /** 列表滚动设置 */
-  scroll?: { x?: number, y?: number }
+  scroll?: { x?: number; y?: number };
 
   [key: string]: any;
 }
@@ -53,9 +59,8 @@ interface EditableTableRef {
  */
 const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTableProps> = (
   props: EditableTableProps,
-  ref: Ref<EditableTableRef | HTMLDivElement>
+  ref: Ref<EditableTableRef | HTMLDivElement>,
 ) => {
-
   const {
     rowKey = 'id',
     columns,
@@ -78,53 +83,64 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
 
   const getOriginalValueDataIndex = (columns: Array<any>, dataSource: Array<any>) => {
     const columnDataMap: any = {};
-    const allColumnDataIndex = columns.map(v => v.dataIndex);
+    const allColumnDataIndex = columns.map((v) => v.dataIndex);
 
-    allColumnDataIndex.forEach(k => {
+    allColumnDataIndex.forEach((k) => {
       columnDataMap[k] = [];
-    })
+    });
 
-    dataSource.forEach(v => {
-      allColumnDataIndex.forEach(k => {
+    dataSource.forEach((v) => {
+      allColumnDataIndex.forEach((k) => {
         const value = v[k] || null;
         columnDataMap[k].push(value);
       });
     });
 
-    return allColumnDataIndex.filter(k => columnDataMap[k].some((v: any) => typeof v !== 'object'));
+    return allColumnDataIndex.filter((k) =>
+      columnDataMap[k].some((v: any) => typeof v !== 'object'),
+    );
   };
 
-  const editableColumns = useMemo(() => () => {
-    if (!Array.isArray(columns) || !columns.length || !Array.isArray(dataSource) || !dataSource.length) return [];
-    const originalValueDataIndex = getOriginalValueDataIndex(columns, dataSource);
-    return columns.filter(v => originalValueDataIndex.includes(v.dataIndex));
-  }, [columns, dataSource]);
+  const editableColumns = useMemo(
+    () => () => {
+      if (
+        !Array.isArray(columns) ||
+        !columns.length ||
+        !Array.isArray(dataSource) ||
+        !dataSource.length
+      )
+        return [];
+      const originalValueDataIndex = getOriginalValueDataIndex(columns, dataSource);
+      return columns.filter((v) => originalValueDataIndex.includes(v.dataIndex));
+    },
+    [columns, dataSource],
+  );
 
   const aa = editableColumns();
-
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
   return (
     <React.Fragment>
-
       <EditableProTable<any>
         className={classNames([])}
         headerTitle={headerTitle}
         columns={editableColumns()}
         rowKey={rowKey}
-        scroll={scroll ? scroll : {x: 'max-content', y: 300}}
+        scroll={scroll ? scroll : { x: 'max-content', y: 300 }}
         value={dataSource}
         onChange={onChange}
         recordCreatorProps={
-          addable ? {
-            newRecordType: 'dataSource',
-            record: () => ({
-              id: uuidv4(),
-              ...defaultRowData
-            }),
-          } : false
+          addable
+            ? {
+                newRecordType: 'dataSource',
+                record: () => ({
+                  id: uuidv4(),
+                  ...defaultRowData,
+                }),
+              }
+            : false
         }
         toolBarRender={() => {
           return typeof toolBarRender === 'function' ? toolBarRender() : [];
@@ -133,13 +149,13 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
           type: 'multiple',
           editableKeys,
           actionRender: (row, config, defaultDoms) => {
-            return typeof optionColumnRender === 'function' ?
-              optionColumnRender(row, config, defaultDoms) :
-              [
-                defaultDoms.delete,
-                // defaultDoms.save,
-                // defaultDoms.cancel
-              ];
+            return typeof optionColumnRender === 'function'
+              ? optionColumnRender(row, config, defaultDoms)
+              : [
+                  defaultDoms.delete,
+                  // defaultDoms.save,
+                  // defaultDoms.cancel
+                ];
           },
           onValuesChange: (record, recordList) => {
             typeof onChange === 'function' && onChange(recordList);
@@ -148,7 +164,6 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
         }}
         {...restProps}
       />
-
     </React.Fragment>
   );
 };

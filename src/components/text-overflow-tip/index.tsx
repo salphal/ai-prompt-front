@@ -1,32 +1,30 @@
 import React, {
-  useEffect,
-  useImperativeHandle,
   ForwardRefRenderFunction,
   Ref,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
   useRef,
   useState,
-  useMemo
-} from "react";
-import {Popover} from "antd";
-import useClientRect from "@/hooks/useClientRect.ts";
+} from 'react';
+import { Popover } from 'antd';
+
+import useClientRect from '@/hooks/useClientRect.ts';
 
 const singleLineStyle = (width: number | string = 'auto'): any => ({
   display: 'inline-block',
   maxWidth: width,
   overflow: 'hidden',
   whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis'
+  textOverflow: 'ellipsis',
 });
 
-const multiLineStyle = (
-  width: number | string = 'auto',
-  total: number
-): any => ({
+const multiLineStyle = (width: number | string = 'auto', total: number): any => ({
   maxWidth: width,
   overflow: 'hidden',
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical' as const,
-  WebkitLineClamp: total as number
+  WebkitLineClamp: total as number,
 });
 
 export interface TextOverflowTipProps {
@@ -62,14 +60,12 @@ export interface TextOverflowTipProps {
 
 interface TextOverflowTipRef {
   [key: string]: any;
-
 }
 
 const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflowTipProps> = (
   props: TextOverflowTipProps,
-  ref: Ref<TextOverflowTipRef | HTMLDivElement>
+  ref: Ref<TextOverflowTipRef | HTMLDivElement>,
 ) => {
-
   const {
     children,
 
@@ -92,7 +88,7 @@ const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflow
   const [isOverflow, setIsOverflow] = useState<any>(false);
 
   const contentRef = useRef(null);
-  const {width: realWidth} = useClientRect({domRef: contentRef});
+  const { width: realWidth } = useClientRect({ domRef: contentRef });
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -102,16 +98,21 @@ const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflow
     setIsOverflow(originalWidth <= realWidth);
   }, [children, originalWidth, realWidth]);
 
-  const overflowContent = useMemo(() => () => {
-    return <span
-      ref={contentRef}
-      style={
-        multiLine ?
-          multiLineStyle(originalWidth, multiNumber) :
-          singleLineStyle(originalWidth)
-      }
-    >{children}</span>;
-  }, [multiLine]);
+  const overflowContent = useMemo(
+    () => () => {
+      return (
+        <span
+          ref={contentRef}
+          style={
+            multiLine ? multiLineStyle(originalWidth, multiNumber) : singleLineStyle(originalWidth)
+          }
+        >
+          {children}
+        </span>
+      );
+    },
+    [multiLine],
+  );
 
   const content = typeof children === 'function' ? children(props) : children;
 
@@ -119,18 +120,13 @@ const TextOverflowTip: ForwardRefRenderFunction<TextOverflowTipRef, TextOverflow
 
   return (
     <React.Fragment>
-
-      {popAble && isOverflow ?
-        <Popover
-          content={popoverContent}
-          trigger={trigger}
-          autoAdjustOverflow
-          {...resetProps}
-        >
+      {popAble && isOverflow ? (
+        <Popover content={popoverContent} trigger={trigger} autoAdjustOverflow {...resetProps}>
           {overflowContent()}
-        </Popover> :
-        overflowContent()}
-
+        </Popover>
+      ) : (
+        overflowContent()
+      )}
     </React.Fragment>
   );
 };

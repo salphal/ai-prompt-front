@@ -1,13 +1,13 @@
-import {RcFile, UploadFileStatus} from "antd/es/upload/interface";
-import {message, UploadFile, UploadProps} from "antd";
-import {saveAs} from "file-saver";
-import {useState} from "react";
+import { useState } from 'react';
+import { message, UploadFile, UploadProps } from 'antd';
+import { RcFile, UploadFileStatus } from 'antd/es/upload/interface';
+import { saveAs } from 'file-saver';
 
 export interface IFile {
-  name: string,
-  size: number,
-  type: string,
-  content: any
+  name: string;
+  size: number;
+  type: string;
+  content: any;
 }
 
 export interface IUseUploadProps {
@@ -28,14 +28,7 @@ export interface IUseUploadProps {
  * </Upload>
  */
 const useUpload = (props: IUseUploadProps = {}) => {
-
-  const {
-    maxCount = 1,
-    defaultProps,
-    onBefore,
-    onChange,
-    onParseJson
-  } = props;
+  const { maxCount = 1, defaultProps, onBefore, onChange, onParseJson } = props;
 
   const [fileList, setFileList] = useState<UploadFile[]>([
     // {
@@ -49,7 +42,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
     name: '',
     size: 0,
     type: 'application/json',
-    content: []
+    content: [],
   });
 
   /**
@@ -57,8 +50,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
    * @param file {RcFile} 上传的文件
    */
   const onImportJson = (file: RcFile) => {
-
-    const {name, size, type} = file;
+    const { name, size, type } = file;
 
     // 创建 FileReader 对象读取文件
     const reader = new FileReader();
@@ -73,14 +65,14 @@ const useUpload = (props: IUseUploadProps = {}) => {
         name,
         size,
         type,
-        content
+        content,
       };
 
       setFileContent(file);
 
       if (result) {
         typeof onParseJson === 'function' && onParseJson(file);
-        message.success(`${name} 解析成功!`)
+        message.success(`${name} 解析成功!`);
       } else {
         message.warning(`${name} 解析文件内容为空!`);
       }
@@ -93,19 +85,18 @@ const useUpload = (props: IUseUploadProps = {}) => {
    * @param ext {string} 文件名后缀
    */
   const onExportFile = (file: any, ext: string = 'json') => {
-
-    const {name = 'prompts', type = 'application/json', size, content} = file;
+    const { name = 'prompts', type = 'application/json', size, content } = file;
 
     if (size === 0) {
-      message.error("文件内容为空");
+      message.error('文件内容为空');
       return;
     }
 
-    const blob = new Blob([content], {type});
+    const blob = new Blob([content], { type });
     const filename = name.indexOf('.') === -1 ? `${name}.${ext}` : name;
 
     saveAs(blob, filename);
-  }
+  };
 
   /**
    * 上传文件之前的钩子
@@ -125,14 +116,13 @@ const useUpload = (props: IUseUploadProps = {}) => {
     }
 
     return true;
-  }
+  };
 
   /**
    * 上传文件改变时的回调，上传每个阶段都会触发该事件
    * @param info {UploadChangeParam<UploadFile>>}
    */
   const uploadOnChange: UploadProps['onChange'] = (info) => {
-
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
     }
@@ -169,7 +159,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
     maxCount,
     fileList,
     beforeUpload: uploadOnBefore,
-    onChange: uploadOnChange
+    onChange: uploadOnChange,
   };
 
   return {
@@ -179,7 +169,7 @@ const useUpload = (props: IUseUploadProps = {}) => {
     fileContent,
     setFileContent,
     onExportFile,
-  }
+  };
 };
 
 export default useUpload;

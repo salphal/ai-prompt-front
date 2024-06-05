@@ -1,4 +1,4 @@
-import {isObject} from "lodash";
+import { isObject } from 'lodash';
 
 export const deconstructObject = (obj: any) => {
   const result: any = {};
@@ -7,7 +7,6 @@ export const deconstructObject = (obj: any) => {
     const value = obj[key];
 
     if (isObject(value) && value !== null) {
-
       if (Array.isArray(value)) {
         result[key] = JSON.stringify(value);
       } else {
@@ -16,7 +15,6 @@ export const deconstructObject = (obj: any) => {
           result[key + '.' + subKey] = flattened[subKey];
         }
       }
-
     } else {
       result[key] = value;
     }
@@ -50,4 +48,4 @@ export const resetObject = (obj: any) => {
     }
   }
   return result;
-}
+};

@@ -5,12 +5,7 @@ export default class Countdown {
   duration: number;
   step: number;
 
-  constructor(
-    initialValue = 0,
-    callback: (count: number) => void,
-    duration = 300,
-    step = 1
-  ) {
+  constructor(initialValue = 0, callback: (count: number) => void, duration = 300, step = 1) {
     this.value = initialValue;
     this.timer = null;
     this.callback = callback;

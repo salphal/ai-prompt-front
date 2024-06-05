@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 const initialClientRect = {
   top: null,
@@ -44,8 +44,7 @@ export interface IUseClientRectProps {
  * @param props {Object}
  */
 const useClientRect = (props: IUseClientRectProps) => {
-
-  const {id, clazzName, domRef} = props;
+  const { id, clazzName, domRef } = props;
 
   const [rect, setRect] = useState<IClientRect>(initialClientRect);
 
@@ -74,6 +73,5 @@ const useClientRect = (props: IUseClientRectProps) => {
 
   return rect;
 };
-
 
 export default useClientRect;

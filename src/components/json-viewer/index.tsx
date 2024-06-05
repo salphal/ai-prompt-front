@@ -1,5 +1,5 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle} from "react";
-import ReactJson, {InteractionProps, ThemeKeys, ThemeObject} from '@microlink/react-json-view';
+import React, { ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle } from 'react';
+import ReactJson, { InteractionProps, ThemeKeys, ThemeObject } from '@microlink/react-json-view';
 
 export type TJsonViewEvent = ((edit: InteractionProps) => false | any) | false;
 
@@ -13,13 +13,13 @@ export interface JsonViewProps {
   /** 皮肤样式名称 */
   theme?: ThemeKeys | ThemeObject;
   /** 图标样式名称 */
-  iconStyle?: "circle" | "triangle" | "square";
+  iconStyle?: 'circle' | 'triangle' | 'square';
   /** 代码锁进长队*/
   indentWidth?: number;
   /** 展示宽度*/
   width?: string | number;
   /** 是否合并( 默认: 不合并 ) */
-  collapsed?: boolean
+  collapsed?: boolean;
   /** 编辑事件 */
   onEdit?: TJsonViewEvent;
   /** 新增事件 */
@@ -41,14 +41,13 @@ interface JsonViewRef {
  */
 const JsonViewer: ForwardRefRenderFunction<JsonViewRef, JsonViewProps> = (
   props: JsonViewProps,
-  ref: Ref<JsonViewRef | HTMLDivElement>
+  ref: Ref<JsonViewRef | HTMLDivElement>,
 ) => {
-
   const {
-    src = "",
-    name = "json view",
-    theme = "rjv-default",
-    iconStyle = "circle",
+    src = '',
+    name = 'json view',
+    theme = 'rjv-default',
+    iconStyle = 'circle',
     indentWidth = 2,
     width = 'auto',
     collapsed = false,
@@ -58,14 +57,13 @@ const JsonViewer: ForwardRefRenderFunction<JsonViewRef, JsonViewProps> = (
     onDelete = false,
     onSelect = false,
 
-    style = {}
+    style = {},
   } = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   const handleJsonViewerEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
     const handles: any = {
@@ -96,17 +94,16 @@ const JsonViewer: ForwardRefRenderFunction<JsonViewRef, JsonViewProps> = (
 
   return (
     <React.Fragment>
-
       <ReactJson
         src={JSON.parse(JSON.stringify(src))}
         defaultValue={{
-          "say": "hello world"
+          say: 'hello world',
         }}
         name={name}
         theme={theme}
         iconStyle={iconStyle}
         indentWidth={indentWidth}
-        style={{...style, width}}
+        style={{ ...style, width }}
         displayDataTypes={false}
         displayObjectSize={false}
         enableClipboard={false}
@@ -116,7 +113,6 @@ const JsonViewer: ForwardRefRenderFunction<JsonViewRef, JsonViewProps> = (
         onDelete={onDelete ? (...args) => handleJsonViewerEventAspect('edit', ...args) : false}
         onSelect={onSelect ? (...args) => handleJsonViewerEventAspect('edit', ...args) : false}
       />
-
     </React.Fragment>
   );
 };

@@ -1,4 +1,4 @@
-import {ERole} from "@/typings/prompt.ts";
+import { ERole } from '@/typings/prompt.ts';
 
 export enum PROMPT_CONTEXT_KEYS {
   role = 'role',
@@ -12,7 +12,7 @@ export const PROMPT_CONTEXT_LABELS = {
   [PROMPT_CONTEXT_KEYS.role]: '角色',
   [PROMPT_CONTEXT_KEYS.content]: '内容',
   [PROMPT_CONTEXT_KEYS.date]: '日期',
-}
+};
 
 export enum PROMPT_MODEL_KEYS {
   name = 'name',
@@ -36,7 +36,7 @@ export const PROMPT_MODEL_LABELS = {
   [PROMPT_MODEL_KEYS.sendMemory]: '自动压缩聊天记录',
   [PROMPT_MODEL_KEYS.historyMessageCount]: '附带历史消息数',
   [PROMPT_MODEL_KEYS.compressMessageLengthThreshold]: '压缩消息长度阈值',
-}
+};
 
 export enum PROMPT_ITEM_KEYS {
   id = 'id',
@@ -56,9 +56,6 @@ export const PROMPT_ITEM_LABELS = {
   [PROMPT_ITEM_KEYS.modelConfig]: '模型配置信息',
   [PROMPT_ITEM_KEYS.lang]: '语言',
   [PROMPT_ITEM_KEYS.builtin]: '是否内置的 Prompt',
-}
+};
 
-export const PROMPT_MODELS = [
-  'gpt-3.5-turbo-16k-0613',
-  'gpt-3.5-turbo-16k',
-]
+export const PROMPT_MODELS = ['gpt-3.5-turbo-16k-0613', 'gpt-3.5-turbo-16k'];

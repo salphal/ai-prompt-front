@@ -1,40 +1,41 @@
-import {Navigate, type RouteObject} from 'react-router-dom'
-import OverviewRoutes from "@/pages/overview/route.tsx";
-import Test from "@/pages/test.tsx";
-import HomeRoutes from "@/pages/home/route.tsx";
-import EditPromptRoutes from "@/pages/edit-prompt/route.tsx";
-import EditJsonRoutes from "@/pages/edit-json/route.tsx";
-import MergeDataRoutes from "@/pages/merge-data/route.tsx";
+import { Navigate, type RouteObject } from 'react-router-dom';
+
+import EditJsonRoutes from '@/pages/edit-json/route.tsx';
+import EditPromptRoutes from '@/pages/edit-prompt/route.tsx';
+import HomeRoutes from '@/pages/home/route.tsx';
+import MergeDataRoutes from '@/pages/merge-data/route.tsx';
+import OverviewRoutes from '@/pages/overview/route.tsx';
+import Test from '@/pages/test.tsx';
 
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <Navigate to="/overview"/>
+    element: <Navigate to="/overview" />,
   },
   {
     path: '/overview/*',
-    element: <OverviewRoutes/>
+    element: <OverviewRoutes />,
   },
   {
     path: '/home/*',
-    element: <HomeRoutes/>
+    element: <HomeRoutes />,
   },
   {
     path: '/edit-prompt/*',
-    element: <EditPromptRoutes/>
+    element: <EditPromptRoutes />,
   },
   {
     path: '/edit-json/*',
-    element: <EditJsonRoutes/>
+    element: <EditJsonRoutes />,
   },
   {
     path: '/merge-data/*',
-    element: <MergeDataRoutes/>
+    element: <MergeDataRoutes />,
   },
   {
     path: '/test',
-    element: <Test/>
-  }
-]
+    element: <Test />,
+  },
+];
 
-export default routes
+export default routes;

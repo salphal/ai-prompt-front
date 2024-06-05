@@ -1,7 +1,8 @@
-import {create} from 'zustand';
-import {createJSONStorage, persist} from "zustand/middleware";
-import {setStoreProperties} from "@/utils/zustand.ts";
-import {createSelectOptions} from "@/utils/antd/select.ts";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { createSelectOptions } from '@/utils/antd/select.ts';
+import { setStoreProperties } from '@/utils/zustand.ts';
 
 export interface IPromptStore {
   /** 提示词数据 */
@@ -23,8 +24,8 @@ export const initialPromptData = {
   defaultRowData: {},
   contextData: [],
 
-  formData: {}
-}
+  formData: {},
+};
 
 // useShallow(); 对象浅比较, 减少重绘
 // const {
@@ -43,8 +44,7 @@ const usePromptStore = create(
         if (!Array.isArray(contextData) || !contextData.length) return [];
         return createSelectOptions(Object.keys(get().contextData[0]));
       },
-      promptColumns: () => {
-      },
+      promptColumns: () => {},
     }),
     {
       name: 'promptStore', // unique name
@@ -55,66 +55,105 @@ const usePromptStore = create(
 );
 
 export const setPromptStore = (props: any) =>
-  usePromptStore.setState((prev: any) => ({...prev, ...props}));
+  usePromptStore.setState((prev: any) => ({ ...prev, ...props }));
 
 export const setPromptProperty = (
   key: string,
   value: any,
   merge = true,
   insertBefore = false,
-  isDeconstruct = false
-) =>
-  setStoreProperties(usePromptStore, key, value, merge, insertBefore, isDeconstruct);
+  isDeconstruct = false,
+) => setStoreProperties(usePromptStore, key, value, merge, insertBefore, isDeconstruct);
 
-export const setDataSource = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('dataSource', value, merge, insertBefore, isDeconstruct);
+export const setDataSource = (
+  value: any,
+  merge = true,
+  insertBefore = false,
+  isDeconstruct = false,
+) => setPromptProperty('dataSource', value, merge, insertBefore, isDeconstruct);
 
 export const setDataSourceById = (id: any, value: any) =>
-  setDataSource((prev: any) => (prev.map((v: any) => v.id === id ? {...v, ...value} : v)));
+  setDataSource((prev: any) => prev.map((v: any) => (v.id === id ? { ...v, ...value } : v)));
 
 export const setDataSourceByMerge = (value: any) =>
-  setDataSource((prev: any) => (prev.map((v: any) => ({...v, ...value}))));
+  setDataSource((prev: any) => prev.map((v: any) => ({ ...v, ...value })));
 
 export const setPromptContextById = (id: any, value: any) =>
-  setDataSource((prev: any) => (prev.map((v: any) => v.id === id ? {...v, context: value} : v)));
+  setDataSource((prev: any) => prev.map((v: any) => (v.id === id ? { ...v, context: value } : v)));
 
 export const resetDataSource = () =>
   setPromptProperty('dataSource', initialPromptData.dataSource, false);
 
-export const setColumnFilterKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('columnFilterKeys', value, merge, insertBefore, isDeconstruct);
+export const setColumnFilterKeys = (
+  value: any,
+  merge = false,
+  insertBefore = false,
+  isDeconstruct = false,
+) => setPromptProperty('columnFilterKeys', value, merge, insertBefore, isDeconstruct);
 
-export const setColumnKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);
+export const setColumnKeys = (
+  value: any,
+  merge = false,
+  insertBefore = false,
+  isDeconstruct = false,
+) => setPromptProperty('columnKeys', value, merge, insertBefore, isDeconstruct);
 
 export const resetColumnKeys = () =>
   setPromptProperty('columnKeys', initialPromptData.columnKeys, false);
 
-export const setContextData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('contextData', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
+export const setContextData = (
+  value: any,
+  merge = false,
+  insertBefore = false,
+  isDeconstruct = false,
+) =>
+  setPromptProperty(
+    'contextData',
+    Array.isArray(value) ? value : [],
+    merge,
+    insertBefore,
+    isDeconstruct,
+  );
 
 export const resetContextData = () =>
   setPromptProperty('contextData', initialPromptData.contextData, false);
 
-export const setSelectedRowKeys = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('selectedRowKeys', Array.isArray(value) ? value : [], merge, insertBefore, isDeconstruct);
+export const setSelectedRowKeys = (
+  value: any,
+  merge = false,
+  insertBefore = false,
+  isDeconstruct = false,
+) =>
+  setPromptProperty(
+    'selectedRowKeys',
+    Array.isArray(value) ? value : [],
+    merge,
+    insertBefore,
+    isDeconstruct,
+  );
 
 export const resetSelectedRowKeys = () =>
   setPromptProperty('selectedRowKeys', initialPromptData.selectedRowKeys, false);
 
-export const setDefaultRowData = (value: any, merge = false, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('defaultRowData', value, merge, insertBefore, isDeconstruct);
+export const setDefaultRowData = (
+  value: any,
+  merge = false,
+  insertBefore = false,
+  isDeconstruct = false,
+) => setPromptProperty('defaultRowData', value, merge, insertBefore, isDeconstruct);
 
 export const resetDefaultRowData = () =>
   setPromptProperty('defaultRowData', initialPromptData.defaultRowData, false);
 
-export const setFormData = (value: any, merge = true, insertBefore = false, isDeconstruct = false) =>
-  setPromptProperty('formData', value, merge, insertBefore, isDeconstruct);
+export const setFormData = (
+  value: any,
+  merge = true,
+  insertBefore = false,
+  isDeconstruct = false,
+) => setPromptProperty('formData', value, merge, insertBefore, isDeconstruct);
 
-export const resetPromptStore = () =>
-  usePromptStore.setState({...initialPromptData});
+export const resetPromptStore = () => usePromptStore.setState({ ...initialPromptData });
 
-export const clearPromptStoreStorage = () =>
-  usePromptStore.persist.clearStorage();
+export const clearPromptStoreStorage = () => usePromptStore.persist.clearStorage();
 
 export default usePromptStore;

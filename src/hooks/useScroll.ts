@@ -1,4 +1,4 @@
-import React, {MutableRefObject, Ref, useEffect, useRef} from 'react';
+import React, { MutableRefObject, Ref, useEffect, useRef } from 'react';
 
 const isString = (target: any): boolean => typeof target === 'string';
 
@@ -7,7 +7,7 @@ const isFunction = (target: any): boolean => typeof target === 'function';
 const isElement = (htmlElement: any): boolean =>
   htmlElement !== null && htmlElement instanceof Element;
 
-const isElementRefObject = <T, >(value: any): value is React.RefObject<T> => {
+const isElementRefObject = <T>(value: any): value is React.RefObject<T> => {
   return (
     value &&
     typeof value === 'object' &&
@@ -17,9 +17,7 @@ const isElementRefObject = <T, >(value: any): value is React.RefObject<T> => {
   );
 };
 
-const getHtmlElement = (
-  htmlElement: Ref<Element> | Element | string
-): Element | null => {
+const getHtmlElement = (htmlElement: Ref<Element> | Element | string): Element | null => {
   let dom: Element | null = null;
 
   try {
@@ -41,7 +39,7 @@ const getHtmlElement = (
 
 const getElementRect = (dom: Element) => {
   const rect = dom.getBoundingClientRect();
-  return {rect, scrollTop: dom.scrollTop, scrollHeight: dom.scrollHeight};
+  return { rect, scrollTop: dom.scrollTop, scrollHeight: dom.scrollHeight };
 };
 
 interface IUseScroll {
@@ -64,7 +62,6 @@ interface IUseScroll {
 }
 
 const useScroll = (kwargs: IUseScroll) => {
-
   const {
     htmlElement = null,
     htmlElementRef = null,
@@ -73,10 +70,8 @@ const useScroll = (kwargs: IUseScroll) => {
     isShow = false,
     minOffsetHeight = 0,
 
-    onScroll = () => {
-    },
-    onTouchToBottom = () => {
-    },
+    onScroll = () => {},
+    onTouchToBottom = () => {},
   } = kwargs;
 
   const domRef = useRef<Element | null>(null);
@@ -88,7 +83,7 @@ const useScroll = (kwargs: IUseScroll) => {
     const dom = getHtmlElement(htmlElementRef || htmlElement || querySelector);
     if (!isElement(dom)) return;
 
-    const {rect} = getElementRect(dom as Element);
+    const { rect } = getElementRect(dom as Element);
     domRectRef.current = rect;
 
     domRef.current = dom;
@@ -104,8 +99,8 @@ const useScroll = (kwargs: IUseScroll) => {
 
     isFunction(onScroll) && onScroll();
 
-    const {rect, scrollTop, scrollHeight} = getElementRect(domRef.current as Element);
-    const {height} = rect;
+    const { rect, scrollTop, scrollHeight } = getElementRect(domRef.current as Element);
+    const { height } = rect;
 
     domRectRef.current = rect;
 

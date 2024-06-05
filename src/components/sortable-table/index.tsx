@@ -1,17 +1,23 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle} from "react";
-import {setDataSource} from "@/store/prompt.ts";
-import {Table} from "antd";
-import {DndContext, DragEndEvent, PointerSensor, useSensor, useSensors} from "@dnd-kit/core";
-import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
-import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
-import {CSS} from "@dnd-kit/utilities";
+import React, { ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle } from 'react';
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Table } from 'antd';
+
+import { setDataSource } from '@/store/prompt.ts';
 
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   'data-row-key': string;
 }
 
 const Row = (props: RowProps) => {
-  const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: props['data-row-key'],
   });
 
@@ -20,12 +26,11 @@ const Row = (props: RowProps) => {
     transform: CSS.Translate.toString(transform),
     transition,
     cursor: 'move',
-    ...(isDragging ? {position: 'relative', zIndex: 999} : {}),
+    ...(isDragging ? { position: 'relative', zIndex: 999 } : {}),
   };
 
   return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
 };
-
 
 export interface SortableTableProps {
   [key: string]: any;
@@ -44,20 +49,14 @@ interface SortableTableRef {
  */
 const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTableProps> = (
   props: SortableTableProps,
-  ref: Ref<SortableTableRef | HTMLDivElement>
+  ref: Ref<SortableTableRef | HTMLDivElement>,
 ) => {
-
-  const {
-    columns = [],
-    dataSource = [],
-    ...restProps
-  } = props;
+  const { columns = [], dataSource = [], ...restProps } = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -68,7 +67,7 @@ const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTablePro
     }),
   );
 
-  const onDragEnd = ({active, over}: DragEndEvent) => {
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
       setDataSource((prev: any) => {
         const activeIndex = prev.findIndex((v: any) => v.id === active.id);
@@ -80,7 +79,6 @@ const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTablePro
 
   return (
     <React.Fragment>
-
       <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
         <SortableContext
           // rowKey array
@@ -100,7 +98,6 @@ const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTablePro
           />
         </SortableContext>
       </DndContext>
-
     </React.Fragment>
   );
 };

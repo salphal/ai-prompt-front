@@ -1,29 +1,37 @@
-import React, {useEffect, useMemo, useState} from "react";
-import classNames from "classnames";
-import {useForm} from "antd/es/form/Form";
-import {AutoComplete, Button, Col, Form, InputNumber, Pagination, Row, Segmented, Switch} from "antd";
-import usePromptStore, {setDataSourceByMerge} from "@/store/prompt.ts";
-import {useShallow} from "zustand/react/shallow";
-import {TAB_KEYS} from "@/pages/merge-data/constant.ts";
-import {v4 as uuidv4} from "uuid";
-import JsonEditor from "@/components/json-editor";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  AutoComplete,
+  Button,
+  Col,
+  Form,
+  InputNumber,
+  Pagination,
+  Row,
+  Segmented,
+  Switch,
+} from 'antd';
+import { useForm } from 'antd/es/form/Form';
+import classNames from 'classnames';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
+import { useShallow } from 'zustand/react/shallow';
+
+import JsonEditor from '@/components/json-editor';
+import { TAB_KEYS } from '@/pages/merge-data/constant.ts';
+import usePromptStore, { setDataSourceByMerge } from '@/store/prompt.ts';
 
 export interface MergeDataProps {
   [key: string]: any;
 }
 
 const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
-
   const navigate = useNavigate();
 
-  const {} = props
+  const {} = props;
 
   const [form] = useForm();
 
-  const {
-    dataSource,
-  } = usePromptStore(useShallow((state: any) => state));
+  const { dataSource } = usePromptStore(useShallow((state: any) => state));
 
   const [tabValue, setTabValue] = useState<string>(TAB_KEYS.original);
 
@@ -43,7 +51,6 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
 
     setAllOptionsMap(allOptions);
     updateValueKeys(allOptions);
-
   }, [dataSource]);
 
   useEffect(() => {
@@ -52,11 +59,10 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
     const radioValues: any = {};
 
     referenceValueKeys.forEach((k) => {
-      radioValues[k] = 0
+      radioValues[k] = 0;
     });
 
     setReferenceRadioValues(radioValues);
-
   }, [referenceValueKeys]);
 
   useEffect(() => {
@@ -66,16 +72,15 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
 
     Object.entries(referenceRadioValues).forEach(([k, i]: any) => {
       const optionsList = allOptionsMap[k];
-      if (!Array.isArray(optionsList) || !optionsList.length || i < 0 || i > optionsList.length) return;
+      if (!Array.isArray(optionsList) || !optionsList.length || i < 0 || i > optionsList.length)
+        return;
       formData[k] = optionsList[i] || {};
     });
 
-    setReferenceFormData((p: any) => ({...p, ...formData}));
-
+    setReferenceFormData((p: any) => ({ ...p, ...formData }));
   }, [allOptionsMap, referenceRadioValues]);
 
   const getAllOptions = (rowData: any) => {
-
     const allItemKeys: any = Object.keys(rowData);
     const allItemOptions: any = {};
 
@@ -83,7 +88,7 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
       allItemOptions[k] = dataSource.reduce((p: Array<any>, v: any) => {
         let currentValue = v[k];
         if (typeof currentValue === 'string') currentValue = currentValue.trim();
-        return p.findIndex(v => v === currentValue) === -1 && currentValue !== ''
+        return p.findIndex((v) => v === currentValue) === -1 && currentValue !== ''
           ? [...p, currentValue]
           : p;
       }, []);
@@ -93,7 +98,6 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
   };
 
   const updateValueKeys = (allOptions: any) => {
-
     if (!Object.keys(allOptions).length) return;
 
     const originalKeys: any = [];
@@ -109,118 +113,125 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
     setReferenceValueKeys(referenceKeys);
   };
 
-  const originalFormItem = useMemo(() => () => {
+  const originalFormItem = useMemo(
+    () => () => {
+      if (
+        !Array.isArray(originalValueKeys) ||
+        !originalValueKeys.length ||
+        !Object.keys(allOptionsMap).length
+      )
+        return [];
 
-    if (!Array.isArray(originalValueKeys) || !originalValueKeys.length || !Object.keys(allOptionsMap).length) return [];
-
-    return originalValueKeys.map((k: any) => {
-      const options = allOptionsMap[k] || [];
-      return (
-        <Row gutter={24} key={uuidv4()}>
-          <Col span={23}>
-            <Form.Item
-              name={k}
-              label={k}
-            >
-              {getArrayItemType(options) === 'string' &&
-                <AutoComplete
-                  placeholder="Please input merge value"
-                  options={options.map((v: any) => ({label: String(v), value: v}))}
-                  allowClear
-                />}
-              {getArrayItemType(options) === 'number' &&
-                <InputNumber
-                  className={classNames(['!w-full'])}
-                  placeholder="Please input merge value"
-                  step={10}
-                  changeOnWheel
-                />
-              }
-              {getArrayItemType(options) === 'boolean' &&
-                <Switch/>}
-            </Form.Item>
-          </Col>
-        </Row>
-      );
-    });
-
-  }, [originalValueKeys, allOptionsMap]);
+      return originalValueKeys.map((k: any) => {
+        const options = allOptionsMap[k] || [];
+        return (
+          <Row gutter={24} key={uuidv4()}>
+            <Col span={23}>
+              <Form.Item name={k} label={k}>
+                {getArrayItemType(options) === 'string' && (
+                  <AutoComplete
+                    placeholder="Please input merge value"
+                    options={options.map((v: any) => ({ label: String(v), value: v }))}
+                    allowClear
+                  />
+                )}
+                {getArrayItemType(options) === 'number' && (
+                  <InputNumber
+                    className={classNames(['!w-full'])}
+                    placeholder="Please input merge value"
+                    step={10}
+                    changeOnWheel
+                  />
+                )}
+                {getArrayItemType(options) === 'boolean' && <Switch />}
+              </Form.Item>
+            </Col>
+          </Row>
+        );
+      });
+    },
+    [originalValueKeys, allOptionsMap],
+  );
 
   const referenceRadioOnChange = (value: any) => {
-    setReferenceRadioValues((p: any) => ({...p, ...value}));
+    setReferenceRadioValues((p: any) => ({ ...p, ...value }));
   };
 
   const referenceJsonEditorOnChange = (value: any) => {
-    setReferenceFormData((p: any) => ({...p, ...value}));
-  }
+    setReferenceFormData((p: any) => ({ ...p, ...value }));
+  };
 
   const referenceItemOnMerge = (key: any) => {
     const data = referenceFormData[key] || {};
     if (!data) return;
-    setDataSourceByMerge({[key]: data});
-    navigate("/home");
-  }
+    setDataSourceByMerge({ [key]: data });
+    navigate('/home');
+  };
 
-  const referencesFormItem = useMemo(() => () => {
-
-    return referenceValueKeys.map((k: any) => {
-      const id = uuidv4();
-      const options = allOptionsMap[k] || [];
-      return (
-        <Row gutter={24} key={id} className={classNames(['mb-10'])}>
-          <Col span={6}>{k}</Col>
-          <Col span={17}>
-            <div className={classNames(['flex', 'justify-start', 'items-center', 'mb-8'])}>
-              <div className={classNames(['flex', 'justify-between', 'w-full'])}>
-                <div className={classNames(['flex', 'justify-start', 'items-center'])} style={{position: "relative"}}>
-                  <Pagination
-                    total={options.length}
-                    current={referenceRadioValues[k]}
-                    pageSize={1}
-                    onChange={(value) => referenceRadioOnChange({[k]: value})}
-                    showQuickJumper
-                  />
-                  <div style={{
-                    padding: 4,
-                    position: "absolute",
-                    right: 0,
-                    backgroundColor: '#f5f5f5',
-                    fontSize: 14,
-                  }}>项
+  const referencesFormItem = useMemo(
+    () => () => {
+      return referenceValueKeys.map((k: any) => {
+        const id = uuidv4();
+        const options = allOptionsMap[k] || [];
+        return (
+          <Row gutter={24} key={id} className={classNames(['mb-10'])}>
+            <Col span={6}>{k}</Col>
+            <Col span={17}>
+              <div className={classNames(['flex', 'justify-start', 'items-center', 'mb-8'])}>
+                <div className={classNames(['flex', 'justify-between', 'w-full'])}>
+                  <div
+                    className={classNames(['flex', 'justify-start', 'items-center'])}
+                    style={{ position: 'relative' }}
+                  >
+                    <Pagination
+                      total={options.length}
+                      current={referenceRadioValues[k]}
+                      pageSize={1}
+                      onChange={(value) => referenceRadioOnChange({ [k]: value })}
+                      showQuickJumper
+                    />
+                    <div
+                      style={{
+                        padding: 4,
+                        position: 'absolute',
+                        right: 0,
+                        backgroundColor: '#f5f5f5',
+                        fontSize: 14,
+                      }}
+                    >
+                      项
+                    </div>
                   </div>
+                  <Button
+                    className={classNames(['ml-8'])}
+                    onClick={() => referenceItemOnMerge(k)}
+                    type={'primary'}
+                  >
+                    Merge
+                  </Button>
                 </div>
-                <Button
-                  className={classNames(['ml-8'])}
-                  onClick={() => referenceItemOnMerge(k)}
-                  type={'primary'}
-                >Merge</Button>
               </div>
-            </div>
-            <JsonEditor
-              content={{
-                json: referenceFormData[k] || {}
-              }}
-              onChange={(content: any) => referenceJsonEditorOnChange(({[k]: content.json}))}
-              height={500}
-            />
-          </Col>
-        </Row>
-      );
-    });
-
-  }, [
-    referenceValueKeys,
-    allOptionsMap,
-    referenceRadioValues,
-    referenceFormData
-  ]);
+              <JsonEditor
+                content={{
+                  json: referenceFormData[k] || {},
+                }}
+                onChange={(content: any) => referenceJsonEditorOnChange({ [k]: content.json })}
+                height={500}
+              />
+            </Col>
+          </Row>
+        );
+      });
+    },
+    [referenceValueKeys, allOptionsMap, referenceRadioValues, referenceFormData],
+  );
 
   const handleMergeDataEventAspect = (type: string, kwargs: any = {}, ...args: any[]) => {
     const handles: any = {
       back: handleMergeDataOnBack,
       merge: handleMergeDataOnMerge,
     };
-    args = (Object.keys(kwargs).length || typeof kwargs !== 'object') ? [kwargs, ...args] : args;
+    args = Object.keys(kwargs).length || typeof kwargs !== 'object' ? [kwargs, ...args] : args;
     handles[type] && handles?.[type](...args);
   };
 
@@ -259,9 +270,7 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
 
   return (
     <React.Fragment>
-
       <div className={classNames(['h-full'])}>
-
         <div className={classNames(['flex', 'justify-center', 'items-center', 'h-24'])}>
           <Segmented<string>
             options={[TAB_KEYS.original, TAB_KEYS.reference]}
@@ -275,35 +284,47 @@ const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
 
         <div
           className={classNames(['overflow-y-auto', 'overflow-x-hidden', 'pb-24'])}
-          style={{height: "calc(100% - 200px)"}}
+          style={{ height: 'calc(100% - 200px)' }}
         >
           <Form
             form={form}
-            labelCol={{span: 6}}
-            wrapperCol={{span: 18}}
-            labelAlign={"left"}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
+            labelAlign={'left'}
             // onValuesChange={formOnValueChange}
           >
             {tabValue === TAB_KEYS.original && originalFormItem()}
             {tabValue === TAB_KEYS.reference && referencesFormItem()}
           </Form>
-
         </div>
 
-        <div className={classNames(['pr-16', 'h-20', 'flex', 'flex-row', 'justify-center', 'items-center'])}>
+        <div
+          className={classNames([
+            'pr-16',
+            'h-20',
+            'flex',
+            'flex-row',
+            'justify-center',
+            'items-center',
+          ])}
+        >
           <Button
             className={classNames(['mr-3'])}
             onClick={() => handleMergeDataEventAspect('back')}
-          >Back</Button>
-          {tabValue === TAB_KEYS.original && <Button
-            className={classNames(['mr-3'])}
-            type={'primary'}
-            onClick={() => handleMergeDataEventAspect('merge')}
-          >Merge</Button>}
+          >
+            Back
+          </Button>
+          {tabValue === TAB_KEYS.original && (
+            <Button
+              className={classNames(['mr-3'])}
+              type={'primary'}
+              onClick={() => handleMergeDataEventAspect('merge')}
+            >
+              Merge
+            </Button>
+          )}
         </div>
-
       </div>
-
     </React.Fragment>
   );
 };

@@ -1,11 +1,12 @@
-import {StateStorage} from "zustand/middleware";
+import { StateStorage } from 'zustand/middleware';
 
 export interface ZustandStore {
-  setState: (...arg: any[]) => void
+  setState: (...arg: any[]) => void;
 }
 
 /** 若存入的不是 object 类型, 而是自定义类, 则展开运算可能会导致私有成员丢失 */
-const isZustandObject = (target: any) => Object.prototype.toString.call(target) === '[object Object]';
+const isZustandObject = (target: any) =>
+  Object.prototype.toString.call(target) === '[object Object]';
 
 const isZustandFunc = (target: any) => typeof target === 'function';
 
@@ -27,49 +28,43 @@ export const setStoreProperties = (
   value: any,
   merge = true,
   insertBefore = false,
-  isDeconstruct = false
+  isDeconstruct = false,
 ) => {
   /** 解决解构丢失私有成员 */
   if (isDeconstruct) {
     store.setState((prev: any) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
     return;
   }
   if (isZustandObject(value)) {
     store.setState((prev: any) => ({
       ...prev,
-      [key]: merge
-        ? {...prev[key], ...value}
-        : {...value}
-    }))
+      [key]: merge ? { ...prev[key], ...value } : { ...value },
+    }));
   } else if (isZustandArray(value)) {
     store.setState((prev: any) => ({
       ...prev,
-      [key]: merge
-        ? !insertBefore
-          ? [...prev[key], ...value]
-          : [...value, ...prev[key]]
-        : value
-    }))
+      [key]: merge ? (!insertBefore ? [...prev[key], ...value] : [...value, ...prev[key]]) : value,
+    }));
   } else if (isZustandFunc(value)) {
     store.setState((prev: any) => ({
       ...prev,
-      [key]: value(prev[key])
-    }))
+      [key]: value(prev[key]),
+    }));
   }
 };
 
 /** custom zustand save methods */
 export const zustandLocalStorage: StateStorage = {
   getItem: (key): string => {
-    return JSON.parse(localStorage.getItem(key) as string)
+    return JSON.parse(localStorage.getItem(key) as string);
   },
   setItem: (key, newValue): void => {
-    localStorage.setItem(key, JSON.stringify(newValue))
+    localStorage.setItem(key, JSON.stringify(newValue));
   },
   removeItem: (key): void => {
     localStorage.removeItem(key);
-  }
+  },
 };

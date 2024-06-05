@@ -1,8 +1,15 @@
-import React, {ForwardRefRenderFunction, Ref, useEffect, useImperativeHandle, useMemo} from "react";
-import classNames from "classnames";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import DraggableItem, {IDraggableItem} from "./draggable-item.tsx";
+import React, {
+  ForwardRefRenderFunction,
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+} from 'react';
+import classNames from 'classnames';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+import DraggableItem, { IDraggableItem } from './draggable-item.tsx';
 
 const draggableListStyle = {
   display: 'flex',
@@ -11,7 +18,7 @@ const draggableListStyle = {
   flexFlow: 'column nowrap',
   height: '100%',
   width: '100%',
-}
+};
 
 /**
  * "react-dnd": "^16.0.1",
@@ -32,20 +39,14 @@ interface DraggableListRef {
 
 const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListProps> = (
   props: DraggableListProps,
-  ref: Ref<DraggableListRef | HTMLDivElement>
+  ref: Ref<DraggableListRef | HTMLDivElement>,
 ) => {
-
-  const {
-    dataSource,
-    setDataSource,
-    clazzNames = []
-  } = props;
+  const { dataSource, setDataSource, clazzNames = [] } = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   const draggableItemOnSwapPlaces = (dragIndex: number, hoverIndex: number) => {
     const min = 0;
@@ -60,24 +61,26 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
     setDataSource(data);
   };
 
-  const draggableList = useMemo(() => () => {
-    if (!Array.isArray(dataSource) || !dataSource.length) {
-      return [];
-    }
-    return dataSource.map((v: IDraggableItem, i: number) => (
-      <DraggableItem
-        id={v.id}
-        key={`draggable-item-${v.id}`}
-        index={i}
-        onSwapPlaces={draggableItemOnSwapPlaces}
-        {...v}
-      />
-    ));
-  }, [dataSource])
+  const draggableList = useMemo(
+    () => () => {
+      if (!Array.isArray(dataSource) || !dataSource.length) {
+        return [];
+      }
+      return dataSource.map((v: IDraggableItem, i: number) => (
+        <DraggableItem
+          id={v.id}
+          key={`draggable-item-${v.id}`}
+          index={i}
+          onSwapPlaces={draggableItemOnSwapPlaces}
+          {...v}
+        />
+      ));
+    },
+    [dataSource],
+  );
 
   return (
     <React.Fragment>
-
       <DndProvider backend={HTML5Backend}>
         <div
           id={'draggable-list'}
@@ -87,7 +90,6 @@ const DraggableList: ForwardRefRenderFunction<DraggableListRef, DraggableListPro
           {draggableList()}
         </div>
       </DndProvider>
-
     </React.Fragment>
   );
 };

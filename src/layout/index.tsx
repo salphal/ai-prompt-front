@@ -1,3 +1,3 @@
-import Layout from "@/layout/layout.tsx";
+import Layout from '@/layout/layout.tsx';
 
 export default Layout;

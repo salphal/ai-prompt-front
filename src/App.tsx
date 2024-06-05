@@ -1,12 +1,13 @@
-import React from "react";
-import Layout from "@/layout";
-import routes from "@/routes";
-import {useLocation, useRoutes} from "react-router-dom";
+import React from 'react';
+import { useLocation, useRoutes } from 'react-router-dom';
+
+import Layout from '@/layout';
+import routes from '@/routes';
+
 import './App.scss';
 
 function App() {
-
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
 
   const page = useRoutes(routes);
 
@@ -14,14 +15,9 @@ function App() {
 
   return (
     <React.Fragment>
-
-      <Layout>
-        {page}
-      </Layout>
-
+      <Layout>{page}</Layout>
     </React.Fragment>
-  )
-
+  );
 }
 
-export default App
+export default App;
