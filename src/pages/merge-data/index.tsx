@@ -27,8 +27,6 @@ export interface MergeDataProps {
 const MergeData: React.FC<MergeDataProps> = (props: MergeDataProps) => {
   const navigate = useNavigate();
 
-  const {} = props;
-
   const [form] = useForm();
 
   const { dataSource } = usePromptStore(useShallow((state: any) => state));
