@@ -34,8 +34,6 @@ const EditTableColumns: ForwardRefRenderFunction<EditTableColumnsRef, EditTableC
 
   const [form] = useForm();
 
-  const {} = props;
-
   const [tabValue, setTabValue] = useState(TAB_KEYS.delete);
   const [json, setJson] = useState<any>({});
 
