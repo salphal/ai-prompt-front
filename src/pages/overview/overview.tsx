@@ -12,8 +12,6 @@ export interface OverviewProps {
 }
 
 const Overview: React.FC<OverviewProps> = (props: OverviewProps) => {
-  const {} = props;
-
   // const [content, setContent] = useState({
   //   json: {
   //     name: "Hello World",
