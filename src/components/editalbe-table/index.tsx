@@ -13,7 +13,7 @@ export interface IColumnItem {
   title: string;
   dataIndex: string;
   width: string | number;
-  valueType?: 'text' | 'select' | 'option' | string;
+  valueType?: 'text' | 'input' | 'select' | 'option' | string;
   formItemProps: {
     [key: string]: any;
     rules: Array<any>;
@@ -56,6 +56,12 @@ interface EditableTableRef {
 
 /**
  * https://procomponents.ant.design/components/editable-table#%E5%AE%9E%E6%97%B6%E4%BF%9D%E5%AD%98%E7%9A%84%E7%BC%96%E8%BE%91%E8%A1%A8%E6%A0%BC
+ *
+ * "antd": "^5.15.3"
+ *
+ * 必须保证数据有唯一 id
+ * 必须保证数据有唯一 id
+ * 必须保证数据有唯一 id
  */
 const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTableProps> = (
   props: EditableTableProps,
@@ -74,8 +80,6 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
     defaultRowData = {},
     ...restProps
   } = props;
-
-  const [optionColumn] = columns.filter((v) => v.valueType === 'option');
 
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
     dataSource.map((item: any) => item.id),
@@ -116,8 +120,6 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
     [columns, dataSource],
   );
 
-  const aa = editableColumns();
-
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
 
@@ -135,6 +137,7 @@ const EditableTable: ForwardRefRenderFunction<EditableTableRef, EditableTablePro
           addable
             ? {
                 newRecordType: 'dataSource',
+                position: 'bottom',
                 record: () => ({
                   id: uuidv4(),
                   ...defaultRowData,
