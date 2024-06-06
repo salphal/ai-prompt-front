@@ -5,8 +5,6 @@ export interface TestProps {
 }
 
 const Test: React.FC<TestProps> = (props: TestProps) => {
-  const {} = props;
-
   useEffect(() => {}, []);
 
   return <React.Fragment>test page</React.Fragment>;
