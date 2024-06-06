@@ -27,8 +27,6 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
 
   const { dataSource, columnFilterKeys } = usePromptStore(useShallow((state: any) => state));
 
-  const {} = props;
-
   const fileOnParse = (file: IFile) => {
     if (file && Array.isArray(file.content)) {
       const data = file.content.map((v: any) => ({ ...v, id: uuidv4() }));
