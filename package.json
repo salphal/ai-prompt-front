@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prepare": "husky || true && echo 'npx lint-staged' > .husky/pre-commit",
+    "prepare": "husky || true && echo 'npx lint-staged' > .husky/pre-commit && echo 'npx --no-install commitlint --edit $1' > .husky/commit-msg",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-path .prettierignore --config .prettierrc . --write --check",
     "tailwindcss": "npx tailwindcss -i ./src/main.scss -o ./public/tailwind.css --watch && npx tailwindcss -o ./public/tailwind.css --minify"
@@ -69,12 +69,6 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.6"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
