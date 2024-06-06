@@ -135,14 +135,14 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
     message = '',
     messageIconType = '',
 
-    styles = {
+    styles: { top, width, height, ...restStyles } = {
       top: '20%',
       width: 500,
       height: 'auto',
     },
     contentStyles = {
       padding: '0 0 20px 0',
-      height: '300px',
+      height: 'auto',
     },
 
     confirmBtnText = '确认',
@@ -178,7 +178,7 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
       marginTop: 0,
     },
     content: {},
-    ...styles,
+    ...props.styles,
   };
 
   // Customize instance values exposed to parent components
@@ -293,10 +293,11 @@ const ConfirmModal: ForwardRefRenderFunction<ConfirmModalRef, ConfirmModalProps>
           title={title}
           open={isOpen}
           footer={footer ? footer : defaultFooter}
-          width={styles.width}
+          width={width}
           style={{
-            top: styles.top,
-            height: styles.height,
+            top,
+            height,
+            ...restStyles,
           }}
           styles={modalStyles}
           closeIcon={<CloseOutlined onClick={() => handleConfirmModalEventAspect('close')} />}
