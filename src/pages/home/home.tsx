@@ -145,7 +145,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   }, [formData]);
 
   useEffect(() => {
-    setTableColumnBlackKeys((prev: any[]) => [...columnFilterKeys]);
+    setTableColumnBlackKeys(() => [...columnFilterKeys]);
   }, [columnFilterKeys]);
 
   const dataSourceByFilter = useMemo(
@@ -210,11 +210,11 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
     navigate(`/edit-json?id=${record.id}`, { state: record });
   };
 
-  const handlePromptOnEditable = (record: any) => {
+  const handlePromptOnEditable = () => {
     setIsEditable((prev) => !prev);
   };
 
-  const handlePromptOnEditColumns = (record: any) => {
+  const handlePromptOnEditColumns = () => {
     editTableColumnModalRef.current.showModal();
   };
 
@@ -247,7 +247,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
   };
 
   const handlePromptOnMerge = () => {
-    navigate(`/merge-data`);
+    navigate('/merge-data');
   };
 
   const formOnValueChange = (changedValues: any, allValues: any) => {
