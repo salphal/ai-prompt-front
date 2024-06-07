@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "prepare": "husky || true && echo 'npx lint-staged' > .husky/pre-commit && echo 'npx --no-install commitlint --edit $1' > .husky/commit-msg",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "prettier": "prettier --ignore-path .prettierignore --config .prettierrc . --write --check",
-    "style": "npx stylelint --config .stylelintrc.cjs **/*.scss",
+    "prettier": "prettier . --write --check --fix",
+    "style": "npx stylelint --fix \"src/**/*.(scss|css)\"",
     "tailwindcss": "npx tailwindcss -i ./src/main.scss -o ./public/tailwind.css --watch && npx tailwindcss -o ./public/tailwind.css --minify"
   },
   "dependencies": {
