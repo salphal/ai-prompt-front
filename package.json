@@ -30,12 +30,12 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "rehype-sanitize": "^6.0.0",
-    "sass": "^1.72.0",
     "uuid": "^9.0.1",
     "vanilla-jsoneditor": "^0.23.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "sass": "^1.72.0",
     "prettier": "^3.3.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
@@ -80,7 +80,8 @@
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
       "npm run prettier",
-      "npm run lint"
+      "npm run lint",
+      "npm run style"
     ]
   },
   "main": "index.js",
