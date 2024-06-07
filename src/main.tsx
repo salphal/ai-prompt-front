@@ -8,8 +8,6 @@ import { ConfigProvider } from 'antd';
 
 import App from './App.tsx';
 
-import './main.scss';
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode>
   <BrowserRouter>
