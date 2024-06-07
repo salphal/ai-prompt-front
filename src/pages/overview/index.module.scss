@@ -12,18 +12,18 @@
       font-size: 32px;
     }
 
-    .subTitle {
+    .sub-title {
       font-size: 24px;
     }
   }
 
   .controller {
-    height: 8%;
-    min-height: 40px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    height: 8%;
+    min-height: 40px;
   }
 
   .content {
