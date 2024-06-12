@@ -10,8 +10,6 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Table } from 'antd';
 
-import { setDataSource } from '@/store/prompt.ts';
-
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   'data-row-key': string;
 }
@@ -51,7 +49,7 @@ const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTablePro
   props: SortableTableProps,
   ref: Ref<SortableTableRef | HTMLDivElement>,
 ) => {
-  const { columns = [], dataSource = [], ...restProps } = props;
+  const { columns = [], dataSource = [], setDataSource, ...restProps } = props;
 
   // Customize instance values exposed to parent components
   useImperativeHandle(ref, () => ({}));
@@ -68,7 +66,7 @@ const SortableTable: ForwardRefRenderFunction<SortableTableRef, SortableTablePro
   );
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id !== over?.id) {
+    if (active.id !== over?.id && typeof setDataSource === 'function') {
       setDataSource((prev: any) => {
         const activeIndex = prev.findIndex((v: any) => v.id === active.id);
         const overIndex = prev.findIndex((v: any) => v.id === over?.id);

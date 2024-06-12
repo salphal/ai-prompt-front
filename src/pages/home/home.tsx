@@ -365,6 +365,7 @@ const Home: ForwardRefRenderFunction<HomeRef, HomeProps> = (
                 loading={loading}
                 rowKey={(record: any) => record.key || record.id}
                 dataSource={dataSourceByFilter()}
+                setDataSource={setDataSource}
                 columns={tableColumns}
                 pagination={false}
                 scroll={tableScroll}
