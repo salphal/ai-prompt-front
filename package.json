@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@ant-design/pro-components": "^2.6.51",
+    "@uiw/react-md-editor": "^4.0.4",
     "antd": "^5.15.3",
+    "file-saver": "^2.0.5",
     "normalize.css": "^8.0.1",
     "query-string": "^9.0.0",
     "react": "^18.2.0",
@@ -29,14 +31,9 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "rehype-sanitize": "^6.0.0",
-    "file-saver": "^2.0.5",
-    "@uiw/react-md-editor": "^4.0.4"
+    "rehype-sanitize": "^6.0.0"
   },
   "devDependencies": {
-    "@emotion/react": "^11.11.4",
-    "lodash": "^4.17.21",
-    "@microlink/react-json-view": "^1.23.0",
     "@ant-design/cssinjs": "^1.20.0",
     "@ant-design/icons": "^5.3.7",
     "@commitlint/cli": "^19.3.0",
@@ -45,7 +42,9 @@
     "@dnd-kit/modifiers": "^7.0.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@emotion/react": "^11.11.4",
     "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@microlink/react-json-view": "^1.23.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.7",
@@ -69,6 +68,7 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
+    "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
     "postcss": "^8.4.35",
     "postcss-import": "^16.0.1",
