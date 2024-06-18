@@ -92,7 +92,8 @@
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
       "npm run prettier",
-      "npm run lint"
+      "npm run lint",
+      "npm run style"
     ]
   },
   "main": "index.js",
