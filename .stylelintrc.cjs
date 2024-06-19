@@ -48,4 +48,10 @@ module.exports = {
     'selector-id-pattern': null,
     'selector-not-notation': null,
   },
+  "ignoreFiles": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+  ]
 };

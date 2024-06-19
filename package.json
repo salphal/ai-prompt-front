@@ -13,9 +13,9 @@
     "preview": "vite preview",
     "prepare": "husky",
     "husky": "echo 'npx lint-staged' > .husky/pre-commit && echo 'npx --no-install commitlint --edit $1' > .husky/commit-msg",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "prettier": "prettier . --write --check --fix",
-    "style": "npx stylelint --fix \"src/**/*.(scss|css)\"",
+    "style": "stylelint \"src/**/*.(scss)\" --fix",
     "tailwindcss": "npx tailwindcss -i ./src/main.scss -o ./public/tailwind.css --watch && npx tailwindcss -o ./public/tailwind.css --minify"
   },
   "dependencies": {

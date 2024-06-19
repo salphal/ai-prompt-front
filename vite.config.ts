@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
+import { ConfigEnv, defineConfig, loadEnv, optimizeDeps, UserConfig } from 'vite';
 
 /**
  * https://vitejs.dev/config/
@@ -30,17 +30,39 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
     plugins: [react()],
     resolve: {
+      // 路径别名
       alias: {
         '@': '/src',
       },
     },
     build: {
+      // 压缩构建产物
       minify: 'terser',
       terserOptions: {
         compress: {
           drop_console: true,
           drop_debugger: true,
         },
+      },
+    },
+    optimizeDeps: {
+      // 依赖预构建( esbuild ), vite 会将预构建存放在 node_modules/.vite 中
+      exclude: [''],
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // 加入全局变量( 不要加入样式，否则在最中产物中会重复出现 )
+          // additionalData: `@import '@/styles/variables.scss';`,
+        },
+      },
+      modules: {
+        /**
+         * @param name {string} - 当前文件名
+         * @param local {string} - 表示当前类名
+         * @param hash {string} - 表示 hash 值
+         */
+        generateScopedName: '[name]_[local]_[hash:base64:5]',
       },
     },
   };
