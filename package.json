@@ -72,6 +72,7 @@
     "mockjs": "^1.1.0",
     "postcss": "^8.4.35",
     "postcss-import": "^16.0.1",
+    "postcss-lit": "^1.1.1",
     "postcss-nesting": "^12.1.0",
     "prettier": "^3.3.0",
     "sass": "^1.72.0",
