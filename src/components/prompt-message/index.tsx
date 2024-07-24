@@ -9,9 +9,9 @@ import { Radio } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
 
-import { ERole } from '../../../typings/prompt.ts';
 import MarkdownEditor from '@/components/markdown-editor';
 import { PROMPT_ROLES } from '@/constants/prompt.ts';
+import { ERole } from '@/typings/prompt.ts';
 
 export interface IPromptMessageForm {
   role: ERole.user | ERole.system | ERole.assistant; // 角色: system: 输入, user: 输出, assistant: 上下文

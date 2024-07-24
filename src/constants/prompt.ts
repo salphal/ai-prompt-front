@@ -1,4 +1,4 @@
-import { ERole } from '../../typings/prompt.ts';
+import { ERole } from '@/typings/prompt.ts';
 
 export enum PROMPT_CONTEXT_KEYS {
   role = 'role',
