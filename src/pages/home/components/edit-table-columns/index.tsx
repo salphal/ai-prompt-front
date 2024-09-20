@@ -143,7 +143,9 @@ const EditTableColumns: ForwardRefRenderFunction<EditTableColumnsRef, EditTableC
         <Segmented
           className={classNames('!mt-3', '!mb-5')}
           value={tabValue}
-          onChange={setTabValue}
+          onChange={(value) => {
+            setTabValue(value);
+          }}
           options={Object.values(TAB_KEYS)}
           size={'large'}
           block
