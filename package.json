@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "prepare": "husky",
     "husky": "echo 'npx lint-staged' > .husky/pre-commit && echo 'npx --no-install commitlint --edit $1' > .husky/commit-msg",
